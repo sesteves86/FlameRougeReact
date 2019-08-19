@@ -1,0 +1,41 @@
+button{
+    width: 90%;
+    height: 50px;
+    border: 1px solid #333;
+    background-color: rgba(230,230,230,0.4);
+}
+
+button:hover{
+    background-color: rgba(230,230,230,0.7);
+    /* outline: 1px solid #fff; */
+    cursor: pointer;
+}
+
+.player{
+    display: inline-block;
+    width: 25%;
+    border: 1px solid black;
+    height: 50vh;
+}
+
+.player-option{
+    display: flex;
+    
+}
+
+.hidden{
+    display: none;
+}
+
+.player0{
+    background-color: #88f;
+}
+.player1{
+    background-color: #8f8;
+}
+.player2{
+    background-color: #f88;
+}
+.player3{
+    background-color: #ff8;
+}
