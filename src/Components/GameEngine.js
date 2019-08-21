@@ -28,7 +28,7 @@ class GameEngine {
         stateUpdate = this._processTurn(stateUpdate);
         this._resetDecisions();
 
-        console.log(stateUpdate);
+        // console.log(stateUpdate);
 
         return stateUpdate;
     }
@@ -50,8 +50,8 @@ class GameEngine {
 
             // this.decisions.push({player: p, isMain: true, decision: options1});
             // this.decisions.push({player: p, isMain: false, decision: options2});
-            this.decisions.push({player: p, isMain: true, decision: 2});
-            this.decisions.push({player: p, isMain: false, decision: 2});
+            this.decisions.push({player: p, isMain: true, decision: Math.floor(Math.random() * 5) + 2 });
+            this.decisions.push({player: p, isMain: false, decision: Math.floor(Math.random() * 5) + 2 });
         }
         
     }
@@ -99,11 +99,16 @@ class GameEngine {
             var targetPosition = rider.positionX + decision;
             var finishLoop = false;
             
-            do{
+            do { // crawl should be done from back to front, as riders can't pass blocked paths
                 if (trackPosition.filter( t =>
                     t.position === targetPosition
                 ).length < 2 ){
                     rider.setPosition(targetPosition);
+                    var tIndex = trackPosition.findIndex( t =>
+                        t.isMain == rider.isPrimary && 
+                        t.player === rider.player
+                        );
+                    trackPosition[tIndex].position = targetPosition;
                     finishLoop = true;
                 } else { // can't move there
                     targetPosition--;
@@ -115,6 +120,35 @@ class GameEngine {
         }, this);
 
         // drag riders
+        var sortedTrackPositions = trackPosition.sort(
+            function(t1, t2) {
+                var p1 = t1.position;
+                var p2 = t2.position;
+    
+                return p1-p2; // Ascending order
+            }
+        );
+        for (let i = 0; i < 7; i++) {
+            var pos = sortedTrackPositions[i].position;
+            var nextPos = sortedTrackPositions[i+1].position;
+            var testPos;
+            // var pos_1 = i > 0 ? sortedTrackPositions[i-1] : -5;
+
+            if (nextPos === pos + 1) { //drag
+                var lPos = pos;
+
+                for (let j = i-1; j <= 0; j--) {
+                    testPos = sortedTrackPositions[j].position;
+                    if (testPos >= lPos - 1) { //within drag range
+                        lPos = testPos;
+                        // Move riders
+                        // update track position
+                    }
+                }
+                // move up current rider
+                // update track position
+            }
+        }
 
         // fatigue riders
 
