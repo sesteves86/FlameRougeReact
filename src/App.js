@@ -62,6 +62,8 @@ class App extends Component {
             stateUpdate = this.state.gameEngine.processRestOfTurn(stateUpdate, this.state.riders);
 
             state2.riders = stateUpdate.riders;
+            console.log("Riders:")
+            console.log(state2.riders);
         }
 
         state2.activePrimaryRider = stateUpdate.activePrimaryRider;
@@ -85,7 +87,7 @@ class App extends Component {
             activePlayer = { this.state.activePlayer }
             activePrimaryRider = { this.state.activePrimaryRider }
             />
-        ));
+        ), this);
         return (
             <div className="App">
                 <h1>Flame Rouge</h1>

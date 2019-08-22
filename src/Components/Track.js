@@ -35,7 +35,7 @@ class Player extends Component {
     ));
 
     function assignNewPosition(rider, index) {
-      if (track[0][rider.positionX].className.length === 31) {
+      if (track[0][rider.positionX].className.search("player") === -1 ) { // if there's no other rider in the above track
         lane = 0 ;
       } else {
         lane = 1 ;

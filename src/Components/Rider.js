@@ -6,7 +6,9 @@ class Rider {
         this.positionX = positionX;
         this.lane = lane;
         this.isSprinter = isSprinter;
-        this.cards = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8];
+        this.cards = isSprinter ? 
+                    [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9] :
+                    [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7];
         this.cardsDiscarded  = [];
         this.nextMove = 0;
     }

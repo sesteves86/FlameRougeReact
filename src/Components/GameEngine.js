@@ -24,6 +24,7 @@ class GameEngine {
 
     processRestOfTurn(stateUpdate, riders) {
         this._getAIDecisions();
+        // var ridersDeepCopy = JSON.parse(JSON.stringify(riders));
         stateUpdate.riders = this._processDecisions(riders);
         stateUpdate = this._processTurn(stateUpdate);
         this._resetDecisions();
@@ -57,13 +58,15 @@ class GameEngine {
     }
 
     _processDecisions(riders) {
+        // ToDo: riders writting possibly disrupting state update
+        console.log("_processDecisions");
         var trackPosition = [];
 
         for (var player=0; player<4; player++) {
             for (var isSprinter = 0; isSprinter < 2; isSprinter++) {
                 var rider = riders.filter( r => 
-                    r.getPlayer() === player && 
-                    r.getPrimary() == isSprinter
+                    r.player === player && 
+                    r.isSprinter == isSprinter
                 )[0];
 
                 var decision = this.decisions.filter( d => 
@@ -79,6 +82,7 @@ class GameEngine {
                 });
             }
         }
+        console.log(riders);
 
         // Get riders Position
         var sortedRiders = riders.sort( function(r1, r2) {
@@ -118,7 +122,9 @@ class GameEngine {
                 }
             } while (!finishLoop)
         }, this);
+        console.log(riders);
 
+        console.log("drag");
         // drag riders // is it working properly?
         var sortedTrackPositions = trackPosition.sort(
             function(t1, t2) {
@@ -146,6 +152,7 @@ class GameEngine {
                     && r.isSprinter == sortedTrackPositions[i].isSprinter
                 )
 
+                console.log("Rider Index: " + riderIndex + " position: " + riders[riderIndex].position + " New position: " + (pos + 1));
                 riders[riderIndex].position = pos + 1;
 
                 // update track position
@@ -165,15 +172,21 @@ class GameEngine {
                             && r.isSprinter == sortedTrackPositions[j].isSprinter
                         )
 
+                        console.log("Rider Index: " + riderIndex + " position: " + riders[riderIndex].position + " New position: " + (pos + 1));
                         riders[riderIndex].position = lPos + 1;
 
                         // update track position
                         sortedTrackPositions[j].position = lPos + 1;
                     }
                 }
+                if(riders === undefined) {
+                    debugger;
+                }
                 
             }
         }
+
+        console.log(riders);
 
         // fatigue riders
 
