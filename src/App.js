@@ -79,8 +79,8 @@ class App extends Component {
             <Player
             key = { p.id }
             player = { p } 
-            rider1 = { this.state.riders.filter( r => r.player === p.id && r.isPrimary === true ) } 
-            rider2 = { this.state.riders.filter( r => r.player === p.id && r.isPrimary === false ) }
+            rider1 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === true ) } 
+            rider2 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === false ) }
             makeDecision = { this.makeDecision }
             activePlayer = { this.state.activePlayer }
             activePrimaryRider = { this.state.activePrimaryRider }

@@ -10,7 +10,7 @@ class Player extends Component {
     for (let lane = 0; lane < 2; lane++) {
       trackLane = [];
 
-      for (let segment = 0; segment < 50; segment++) {
+      for (let segment = 0; segment < 50; segment++) { // 70 segments
         trackLane.push(
           {
             className: "track-segment track-segment-" + lane + "-" + segment,
@@ -41,7 +41,7 @@ class Player extends Component {
         lane = 1 ;
       }
       track[lane][rider.positionX].className += " track-segment-player-" + rider.player;
-        track[lane][rider.positionX].rider = rider.isPrimary ? "A" : "B";
+        track[lane][rider.positionX].rider = rider.isSprinter ? "S" : "R";
     };
 
     return track;

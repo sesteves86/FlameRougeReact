@@ -20,7 +20,7 @@ class Player extends Component {
 
         const playerTitle = 
             human ? 
-                "Human" +  id :
+                "Human " +  id :
                 "CPU " +  id ;
 
         const playerClass = "player player" + this.props.player.id;
@@ -29,7 +29,7 @@ class Player extends Component {
             <div className={playerClass}>
                 { playerTitle }
                 <div>
-                    <h3>C1</h3>
+                    <h3>Sprinter</h3>
                     { human === true && this.props.activePlayer === this.props.player.id && this.props.activePrimaryRider &&
                         
                         <div className="player-option">
@@ -45,7 +45,7 @@ class Player extends Component {
                     }
                 </div>
                 <div>
-                    <h3>C2</h3>
+                    <h3>Roller</h3>
                     { human === true && this.props.activePlayer === this.props.player.id && !this.props.activePrimaryRider &&
                         <div className="player-option">
                             {options2.map( (option, index) => (

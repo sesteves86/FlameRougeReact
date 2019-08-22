@@ -1,11 +1,11 @@
 import './../Styles/Track.css';
 
 class Rider {
-    constructor(player, positionX, lane, isPrimary){
+    constructor(player, positionX, lane, isSprinter){
         this.player = player;
         this.positionX = positionX;
         this.lane = lane;
-        this.isPrimary = isPrimary;
+        this.isSprinter = isSprinter;
         this.cards = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8];
         this.cardsDiscarded  = [];
         this.nextMove = 0;
@@ -45,7 +45,7 @@ class Rider {
         return this.player;
     }
     getPrimary(){
-        return this.isPrimary;
+        return this.isSprinter;
     }
 
     setLane(lane){

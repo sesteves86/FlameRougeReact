@@ -5,10 +5,10 @@ class GameEngine {
         this.decisions = [];
     }
 
-    setHumanDecision(isMain, value) {
+    setHumanDecision(isSprinter, value) {
         var activePlayer = 0;
         
-        if (isMain) {
+        if (isSprinter) {
             this.decision1 = value;
         } else {
             this.decision2 = value;
@@ -17,7 +17,7 @@ class GameEngine {
         }
 
         return {
-            activePrimaryRider: !isMain,
+            activePrimaryRider: !isSprinter,
             activePlayer: activePlayer
         }
     }
@@ -36,8 +36,8 @@ class GameEngine {
     /* Private functions*/
 
     _getAIDecisions() {
-        this.decisions.push({player: 0, isMain: true, decision: this.decision1});
-        this.decisions.push({player: 0, isMain: false, decision: this.decision2});
+        this.decisions.push({player: 0, isSprinter: true, decision: this.decision1});
+        this.decisions.push({player: 0, isSprinter: false, decision: this.decision2});
 
         //Need to have access to players data to make AI decisions?
         for (var p = 1; p < 4; p++) { // foreach AI
@@ -48,10 +48,10 @@ class GameEngine {
             // var options1 = this.props.rider1[0].getTopCard();
             // var options2 = this.props.rider2[0].getTopCard();
 
-            // this.decisions.push({player: p, isMain: true, decision: options1});
-            // this.decisions.push({player: p, isMain: false, decision: options2});
-            this.decisions.push({player: p, isMain: true, decision: Math.floor(Math.random() * 5) + 2 });
-            this.decisions.push({player: p, isMain: false, decision: Math.floor(Math.random() * 5) + 2 });
+            // this.decisions.push({player: p, isSprinter: true, decision: options1});
+            // this.decisions.push({player: p, isSprinter: false, decision: options2});
+            this.decisions.push({player: p, isSprinter: true, decision: Math.floor(Math.random() * 5) + 2 });
+            this.decisions.push({player: p, isSprinter: false, decision: Math.floor(Math.random() * 5) + 2 });
         }
         
     }
@@ -60,21 +60,21 @@ class GameEngine {
         var trackPosition = [];
 
         for (var player=0; player<4; player++) {
-            for (var isMain = 0; isMain < 2; isMain++) {
+            for (var isSprinter = 0; isSprinter < 2; isSprinter++) {
                 var rider = riders.filter( r => 
                     r.getPlayer() === player && 
-                    r.getPrimary() == isMain
+                    r.getPrimary() == isSprinter
                 )[0];
 
                 var decision = this.decisions.filter( d => 
                         d.player === player &&
-                        d.isMain === isMain);
+                        d.isSprinter === isSprinter);
             
                 rider.useCard(decision.decision);
 
                 trackPosition.push({
                     player: player,
-                    isMain: isMain,
+                    isSprinter: isSprinter,
                     position: rider.positionX
                 });
             }
@@ -92,7 +92,7 @@ class GameEngine {
         sortedRiders.forEach( function(rider) {
             var decision = this.decisions.filter( d => 
                 d.player === rider.player &&
-                d.isMain === rider.isPrimary)[0].decision;
+                d.isSprinter === rider.isSprinter)[0].decision;
             
             rider.useCard(decision);
 
@@ -105,7 +105,7 @@ class GameEngine {
                 ).length < 2 ){
                     rider.setPosition(targetPosition);
                     var tIndex = trackPosition.findIndex( t =>
-                        t.isMain == rider.isPrimary && 
+                        t.isSprinter == rider.isSprinter && 
                         t.player === rider.player
                         );
                     trackPosition[tIndex].position = targetPosition;
@@ -119,7 +119,7 @@ class GameEngine {
             } while (!finishLoop)
         }, this);
 
-        // drag riders
+        // drag riders // is it working properly?
         var sortedTrackPositions = trackPosition.sort(
             function(t1, t2) {
                 var p1 = t1.position;
@@ -128,31 +128,54 @@ class GameEngine {
                 return p1-p2; // Ascending order
             }
         );
+        // foreach sorted track position
+        // debugger;
         for (let i = 0; i < 7; i++) {
             var pos = sortedTrackPositions[i].position;
             var nextPos = sortedTrackPositions[i+1].position;
             var testPos;
             // var pos_1 = i > 0 ? sortedTrackPositions[i-1] : -5;
 
-            if (nextPos === pos + 1) { //drag
+            if (nextPos === pos + 2) { // drag happens
                 var lPos = pos;
 
-                for (let j = i-1; j <= 0; j--) {
-                    testPos = sortedTrackPositions[j].position;
-                    if (testPos >= lPos - 1) { //within drag range
-                        lPos = testPos;
-                        // Move riders
-                        // update track position
-                    }
-                }
                 // move up current rider
                 // update track position
+                var riderIndex = riders.findIndex( r => 
+                    r.player === sortedTrackPositions[i].player 
+                    && r.isSprinter == sortedTrackPositions[i].isSprinter
+                )
+
+                riders[riderIndex].position = pos + 1;
+
+                // update track position
+                sortedTrackPositions[i].position = pos + 1;
+
+
+                for (let j = i-1; j <= 0; j--) {
+                    if(j<0){
+                        return;
+                    }
+                    testPos = sortedTrackPositions[j].position;
+                    if (testPos === lPos - 2) { //within drag range
+                        lPos = testPos;
+                        // Move riders
+                        var riderIndex = riders.findIndex( r => 
+                            r.player === sortedTrackPositions[j].player 
+                            && r.isSprinter == sortedTrackPositions[j].isSprinter
+                        )
+
+                        riders[riderIndex].position = lPos + 1;
+
+                        // update track position
+                        sortedTrackPositions[j].position = lPos + 1;
+                    }
+                }
+                
             }
         }
 
         // fatigue riders
-
-        // shuffle?
 
         return riders;
     }
