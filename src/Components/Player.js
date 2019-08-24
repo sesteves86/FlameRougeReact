@@ -13,8 +13,8 @@ class Player extends Component {
 
         rider1.shuffle();
         rider2.shuffle();
-        var options1 = rider1.getTop5Cards();
-        var options2 = rider2.getTop5Cards();
+        var options1 = rider1.getTop4Cards();
+        var options2 = rider2.getTop4Cards();
 
         const { id, human } = this.props.player;
 

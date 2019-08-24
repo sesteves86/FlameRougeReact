@@ -10,7 +10,7 @@ class Player extends Component {
     for (let lane = 0; lane < 2; lane++) {
       trackLane = [];
 
-      for (let segment = 0; segment < 50; segment++) { // 70 segments
+      for (let segment = 0; segment < 70; segment++) { // 70 segments
         trackLane.push(
           {
             className: "track-segment track-segment-" + lane + "-" + segment,

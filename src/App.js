@@ -43,11 +43,15 @@ class App extends Component {
             ],
             activePlayer: 0,
             activePrimaryRider: true,
-            gameEngine: new GameEngine()
+            gameEngine: new GameEngine(),
+            hasFinished: false,
+            winner: "Player 5"
         };
     }
 
     makeDecision = (key, value) => {
+        console.log("Starting state at makeDecision()");
+        
         if (!this.state.activePlayer === 0){
             return;
         }
@@ -64,10 +68,19 @@ class App extends Component {
             state2.riders = stateUpdate.riders;
             console.log("Riders:")
             console.log(state2.riders);
+            console.log(stateUpdate.riders);
         }
 
         state2.activePrimaryRider = stateUpdate.activePrimaryRider;
         state2.activePlayer = stateUpdate.activePlayer;
+
+        var maxPosition = Math.max.apply(Math, state2.riders.map(function(o) { return o.positionX; }));
+        var winningPlayer = state2.riders.filter( r => r.positionX === maxPosition)[0].player;
+
+        if (maxPosition >= 20) {
+            state2.hasFinished = true;
+            state2.winner = winningPlayer;
+        }
 
         this.setState(state2);
 
@@ -79,22 +92,28 @@ class App extends Component {
 
         const renderedPlayers = this.state.players.map( (p) => (
             <Player
-            key = { p.id }
-            player = { p } 
-            rider1 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === true ) } 
-            rider2 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === false ) }
-            makeDecision = { this.makeDecision }
-            activePlayer = { this.state.activePlayer }
-            activePrimaryRider = { this.state.activePrimaryRider }
+                key = { p.id }
+                player = { p } 
+                rider1 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === true ) } 
+                rider2 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === false ) }
+                makeDecision = { this.makeDecision }
+                activePlayer = { this.state.activePlayer }
+                activePrimaryRider = { this.state.activePrimaryRider }
             />
         ), this);
         return (
             <div className="App">
                 <h1>Flame Rouge</h1>
+                
                 <Track  riders={this.state.riders} />
                 <div className = "playersContainer" >
                     { renderedPlayers }
                 </div>
+
+                <h2>
+                    Player {this.state.winningPlayer} wins
+                </h2>
+                
             </div>
         );
     }

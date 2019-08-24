@@ -27,14 +27,19 @@ class Rider {
         return this.cards.slice(0,1);
     }
 
-    getTop5Cards(){
-        return this.cards.slice(0,5);
+    getTop4Cards(){
+        return this.cards.slice(0,4);
     }
 
     useCard(x){
-        this.nextMove = this.cards[x];
-        this.cards.splice(x,1);
-        // console.log("card used for player " + this.player);
+        var index = this.cards.indexOf(x);
+
+        if (index === -1) {
+            console.error("Tried to use invalid card");
+            debugger;
+        } else {
+            this.cards.splice(index,1); 
+        }
     }
 
     getLane(){
