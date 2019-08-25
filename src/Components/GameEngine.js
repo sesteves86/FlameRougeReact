@@ -29,10 +29,7 @@ class GameEngine {
         this._getAIDecisions(riders);
         
         var ridersDeepCopy =_deepCopyRiders(riders);
-        console.log(riders);
-        console.log(ridersDeepCopy);
         stateUpdate.riders = this._processDecisions(ridersDeepCopy);
-        console.log(stateUpdate.riders); // Prototype functions are not being passed
         stateUpdate = this._processTurn(stateUpdate);
         this._resetDecisions();
 
@@ -69,7 +66,6 @@ class GameEngine {
     }
 
     _processDecisions(riders) {
-        // debugger;
         console.log("_processDecisions");
         var trackPosition = [];
 
@@ -94,7 +90,6 @@ class GameEngine {
                 });
             }
         }
-        console.log(riders);
 
         // Get riders Position
         var sortedRiders = riders.sort( function(r1, r2) {
@@ -132,10 +127,9 @@ class GameEngine {
                 }
             } while (!finishLoop)
         }, this);
-        console.log(riders);
 
         console.log("drag");
-        // drag riders // is it working properly?
+        // drag riders 
         var sortedTrackPositions = trackPosition.sort(
             function(t1, t2) {
                 var p1 = t1.position;
@@ -144,37 +138,36 @@ class GameEngine {
                 return p1-p2; // Ascending order
             }
         );
+        
         // foreach sorted track position
+        // console.log(sortedTrackPositions.map( function(o) { return o.position; }));
         debugger;
         for (let i = 0; i < 7; i++) {
             var pos = sortedTrackPositions[i].position;
             var nextPos = sortedTrackPositions[i+1].position;
             var testPos;
-            // var pos_1 = i > 0 ? sortedTrackPositions[i-1] : -5;
 
             if (nextPos === pos + 2) { // drag happens
                 var lPos = pos;
 
                 // move up current rider
-                // update track position
+                
                 var riderIndex = riders.findIndex( r => 
                     r.player === sortedTrackPositions[i].player 
                     && r.isSprinter == sortedTrackPositions[i].isSprinter
                 )
 
-                console.log("Rider Index: " + riderIndex + " position: " + riders[riderIndex].position + " New position: " + (pos + 1));
-                riders[riderIndex].position = pos + 1;
+                riders[riderIndex].positionX = pos + 1;
 
-                // update track position
                 sortedTrackPositions[i].position = pos + 1;
 
 
-                for (let j = i-1; j <= 0; j--) {
+                for (let j = i-1; j >= 0; j--) {
                     if(j<0){
                         return;
                     }
                     testPos = sortedTrackPositions[j].position;
-                    if (testPos === lPos - 2) { //within drag range
+                    if (testPos > lPos - 2) { //within drag range
                         lPos = testPos;
                         // Move riders
                         var riderIndex = riders.findIndex( r => 
@@ -182,21 +175,17 @@ class GameEngine {
                             && r.isSprinter == sortedTrackPositions[j].isSprinter
                         )
 
-                        console.log("Rider Index: " + riderIndex + " position: " + riders[riderIndex].position + " New position: " + (pos + 1));
-                        riders[riderIndex].position = lPos + 1;
+                        riders[riderIndex].positionX = lPos + 1;
 
                         // update track position
                         sortedTrackPositions[j].position = lPos + 1;
+                    } else {
+                        j = -1;
                     }
-                }
-                if(riders === undefined) {
-                    debugger;
                 }
                 
             }
         }
-
-        console.log(riders);
 
         // fatigue riders
 
