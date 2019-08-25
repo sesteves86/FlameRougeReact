@@ -3,14 +3,14 @@ import './../Styles/Track.css';
 
 class Player extends Component {
 
-  initialisePositions(){
+  initialisePositions(trackLength){
     let trackRender = [];
     let trackLane = [];
-
+    
     for (let lane = 0; lane < 2; lane++) {
       trackLane = [];
 
-      for (let segment = 0; segment < 70; segment++) { // 70 segments
+      for (let segment = 0; segment < trackLength; segment++) { 
         trackLane.push(
           {
             className: "track-segment track-segment-" + lane + "-" + segment,
@@ -26,22 +26,25 @@ class Player extends Component {
   }
 
   assignPositions(){
-    let track = this.initialisePositions();
+    const trackLength = 70;
+    let track = this.initialisePositions(trackLength);
     let lane = 0;
 
     //assign new position
     this.props.riders.map( (rider, index) => (
-      assignNewPosition(rider, index)
+      assignNewPosition(rider, index, trackLength)
     ));
 
-    function assignNewPosition(rider, index) {
-      if (track[0][rider.positionX].className.search("player") === -1 ) { // if there's no other rider in the above track
-        lane = 0 ;
-      } else {
-        lane = 1 ;
-      }
-      track[lane][rider.positionX].className += " track-segment-player-" + rider.player;
+    function assignNewPosition(rider, index, trackLength) {
+      if (rider.positionX < trackLength){ // still racing
+        if (track[0][rider.positionX].className.search("player") === -1 ) { // if there's no other rider in the above track
+          lane = 0 ;
+        } else {
+          lane = 1 ;
+        }
+        track[lane][rider.positionX].className += " track-segment-player-" + rider.player;
         track[lane][rider.positionX].rider = rider.isSprinter ? "S" : "R";
+      }
     };
 
     return track;

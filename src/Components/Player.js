@@ -23,7 +23,7 @@ class Player extends Component {
                 "Human " +  id :
                 "CPU " +  id ;
 
-        const playerClass = "player player" + this.props.player.id;
+        const playerClass = "player player" + this.props.player.id + (this.props.hasFinished ? " hidden" : "");
 
         return (
             <div className={playerClass}>

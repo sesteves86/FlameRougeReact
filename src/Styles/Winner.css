@@ -1,0 +1,21 @@
+.winner {
+    font-size: 20px;
+    color: black;
+    height: 50px;
+}
+
+.winner-0 {
+    background-color: #88f;
+}
+.winner-1{
+    background-color: #8f8;
+}
+.winner-2{
+    background-color: #f88;
+}
+.winner-3{
+    background-color: #ff8;
+}
+.winner-5{
+    background-color: #888;
+}

@@ -3,6 +3,7 @@ import GameEngine from './Components/GameEngine';
 import Player from './Components/Player';
 import Track from './Components/Track';
 import Rider from './Components/Rider';
+import WinnerScreen from './Components/WinnerScreen';
 import './App.css';
 
 class App extends Component {
@@ -45,7 +46,7 @@ class App extends Component {
             activePrimaryRider: true,
             gameEngine: new GameEngine(),
             hasFinished: false,
-            winner: "Player 5"
+            winner: 5
         };
     }
 
@@ -74,7 +75,7 @@ class App extends Component {
         var maxPosition = Math.max.apply(Math, state2.riders.map(function(o) { return o.positionX; }));
         var winningPlayer = state2.riders.filter( r => r.positionX === maxPosition)[0].player;
 
-        if (maxPosition >= 20) {
+        if (maxPosition >= 70) {
             state2.hasFinished = true;
             state2.winner = winningPlayer;
         }
@@ -85,8 +86,6 @@ class App extends Component {
     }
 
     render() {
-        console.log("Rendering: \n Active player: " + this.state.activePlayer + ", isSprinter " + this.state.activePrimaryRider);
-
         const renderedPlayers = this.state.players.map( (p) => (
             <Player
                 key = { p.id }
@@ -96,8 +95,10 @@ class App extends Component {
                 makeDecision = { this.makeDecision }
                 activePlayer = { this.state.activePlayer }
                 activePrimaryRider = { this.state.activePrimaryRider }
+                hasFinished = { this.state.hasFinished}
             />
         ), this);
+        
         return (
             <div className="App">
                 <h1>Flame Rouge</h1>
@@ -107,10 +108,10 @@ class App extends Component {
                     { renderedPlayers }
                 </div>
 
-                <h2>
-                    Player {this.state.winningPlayer} wins
-                </h2>
-                
+                <WinnerScreen
+                    hasFinished = {this.state.hasFinished}
+                    winningPlayer = {this.state.winner}
+                />
             </div>
         );
     }
