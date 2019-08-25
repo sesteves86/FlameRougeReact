@@ -3,7 +3,7 @@ import './../Styles/Track.css';
 
 class Player extends Component {
 
-  initialisePositions(trackLength){
+  initialisePositions(trackLength, trackHills){
     let trackRender = [];
     let trackLane = [];
     
@@ -13,7 +13,11 @@ class Player extends Component {
       for (let segment = 0; segment < trackLength; segment++) { 
         trackLane.push(
           {
-            className: "track-segment track-segment-" + lane + "-" + segment,
+            className: "track-segment track-segment-" + lane + "-" + segment + " " + 
+                            (trackHills.up.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
+                            "track-up" : "") +
+                            (trackHills.down.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
+                            "track-down" : ""),
             rider: ""
           }
         );
@@ -25,9 +29,9 @@ class Player extends Component {
     return trackRender;
   }
 
-  assignPositions(){
+  assignPositions(trackHills){
     const trackLength = 70;
-    let track = this.initialisePositions(trackLength);
+    let track = this.initialisePositions(trackLength, trackHills);
     let lane = 0;
 
     //assign new position
@@ -51,7 +55,7 @@ class Player extends Component {
   }
 
   render() {
-    let trackRender = this.assignPositions();
+    let trackRender = this.assignPositions(this.props.trackHills);
 
     return (
       <div className="track">

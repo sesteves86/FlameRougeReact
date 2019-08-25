@@ -1,0 +1,19 @@
+.help-menu-container {
+    background-color: #ccc;
+    border: 3px solid #555;
+    border-radius: 15px;
+    margin: 10px auto;
+    padding: 20px;
+    text-align: left;
+    width: 80%;
+}
+
+.help-toggle-button {
+    background-color: #cfc;
+    border: 3px solid #0c0;
+    border-radius: 15px;
+    height: 30px;
+    margin: 10px auto;
+    width: 200px;
+}
+

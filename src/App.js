@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import GameEngine from './Components/GameEngine';
+import Help from './Components/Help';
 import Player from './Components/Player';
-import Track from './Components/Track';
 import Rider from './Components/Rider';
+import Track from './Components/Track';
 import WinnerScreen from './Components/WinnerScreen';
 import './App.css';
 
@@ -12,6 +13,21 @@ class App extends Component {
 
         this.state = 
         {
+            activePlayer: 0,
+            activePrimaryRider: true,
+            gameEngine: new GameEngine(),
+            hasFinished: false,
+            helpMenu: false,
+            riders: [
+                new Rider( 0 , 3, 0, true),
+                new Rider( 0 , 0, 1, false),
+                new Rider( 1 , 2, 0, true),
+                new Rider( 1 , 1, 1, false),
+                new Rider( 2 , 1, 0, true),
+                new Rider( 2 , 2, 1, false),
+                new Rider( 3 , 0, 0, true),
+                new Rider( 3 , 3, 1, false)
+            ],
             players: 
             [
                 {
@@ -31,21 +47,10 @@ class App extends Component {
                     human: false
                 }
             ],
-            // player, initial position x, y, isSprinter?
-            riders: [
-                new Rider( 0 , 3, 0, true),
-                new Rider( 0 , 0, 1, false),
-                new Rider( 1 , 2, 0, true),
-                new Rider( 1 , 1, 1, false),
-                new Rider( 2 , 1, 0, true),
-                new Rider( 2 , 2, 1, false),
-                new Rider( 3 , 0, 0, true),
-                new Rider( 3 , 3, 1, false)
-            ],
-            activePlayer: 0,
-            activePrimaryRider: true,
-            gameEngine: new GameEngine(),
-            hasFinished: false,
+            trackHills: {
+                up: [15, 40],
+                down: [10, 45]
+            },
             winner: 5
         };
     }
@@ -85,6 +90,11 @@ class App extends Component {
         console.log("Finished making decision");
     }
 
+    toggleHelp = () => {
+        this.state.helpMenu = !this.state.helpMenu;
+        this.setState(this.state);
+    }
+
     render() {
         const renderedPlayers = this.state.players.map( (p) => (
             <Player
@@ -102,8 +112,16 @@ class App extends Component {
         return (
             <div className="App">
                 <h1>Flame Rouge</h1>
+
+                <Help
+                    helpMenu = {this.state.helpMenu}
+                    toggleHelp = {this.toggleHelp}
+                />
                 
-                <Track  riders={this.state.riders} />
+                <Track 
+                    riders = {this.state.riders}
+                    trackHills = {this.state.trackHills}
+                />
                 <div className = "playersContainer" >
                     { renderedPlayers }
                 </div>

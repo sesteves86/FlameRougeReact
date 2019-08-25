@@ -30,3 +30,9 @@
 .track-segment-player-3{
     background-color: #ff8;
 }
+.track-down{
+    border: 2px solid #aaf;
+}
+.track-up{
+    border: 2px solid #faa;
+}
