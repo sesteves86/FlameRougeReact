@@ -66,9 +66,6 @@ class App extends Component {
             stateUpdate = this.state.gameEngine.processRestOfTurn(stateUpdate, this.state.riders);
 
             state2.riders = stateUpdate.riders;
-            console.log("Riders:")
-            console.log(state2.riders);
-            console.log(stateUpdate.riders);
         }
 
         state2.activePrimaryRider = stateUpdate.activePrimaryRider;

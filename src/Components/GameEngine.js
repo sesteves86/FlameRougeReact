@@ -58,8 +58,12 @@ class GameEngine {
                 && r.isSprinter == false
             )[0].cards;
             var cardChosenIndex2 = Math.floor(Math.random() * cards2.length);
+            if( cards1[cardChosenIndex1] === undefined || cards2[cardChosenIndex2] === undefined) {
+                console.error("Bad AI decision");
+                debugger;
+            }
 
-            this.decisions.push({player: p, isSprinter: true, decision: cards1[cardChosenIndex2] });
+            this.decisions.push({player: p, isSprinter: true, decision: cards1[cardChosenIndex1] });
             this.decisions.push({player: p, isSprinter: false, decision: cards2[cardChosenIndex2] });
         }
         
@@ -96,7 +100,7 @@ class GameEngine {
             var p1 = r1.getPosition() + r1.getLane()*0.5;
             var p2 = r2.getPosition() + r2.getLane()*0.5;
 
-            return p1-p2;
+            return p2-p1;
         });
 
         // for each rider, move the expected number of squares, if possible
@@ -108,10 +112,10 @@ class GameEngine {
             var targetPosition = rider.positionX + decision;
             var finishLoop = false;
             
-            do { // crawl should be done from back to front, as riders can't pass blocked paths
+            do { 
                 if (trackPosition.filter( t =>
                     t.position === targetPosition
-                ).length < 2 ){
+                ).length < 2 ) { // move here
                     rider.setPosition(targetPosition);
                     var tIndex = trackPosition.findIndex( t =>
                         t.isSprinter == rider.isSprinter && 
@@ -140,8 +144,6 @@ class GameEngine {
         );
         
         // foreach sorted track position
-        // console.log(sortedTrackPositions.map( function(o) { return o.position; }));
-        debugger;
         for (let i = 0; i < 7; i++) {
             var pos = sortedTrackPositions[i].position;
             var nextPos = sortedTrackPositions[i+1].position;
@@ -188,6 +190,20 @@ class GameEngine {
         }
 
         // fatigue riders
+        console.log("fatigue");
+        
+        sortedTrackPositions.forEach( function(trackPosition, index) {
+            if (sortedTrackPositions.filter(t =>
+                t.position === trackPosition.position + 1
+            ).length <= 0 ) { //in front of the pack
+                var riderIndex = riders.findIndex( r => 
+                    r.player === sortedTrackPositions[index].player 
+                    && r.isSprinter == sortedTrackPositions[index].isSprinter
+                )
+
+                riders[riderIndex].getTired();
+            }
+        }, this);
 
         return riders;
     }
