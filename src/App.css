@@ -1,5 +1,22 @@
+.mainTitle {
+  background-color: rgba(200,200,200,0.5);
+  color: #a00;
+  font-size: 45px;
+  font-family: "Georgia";
+  margin: 10px auto;
+}
+
 .App {
   text-align: center;
+}
+
+.backgroundImage {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
 }
 
 .playersContainer{

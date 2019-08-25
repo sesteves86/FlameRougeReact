@@ -111,7 +111,8 @@ class App extends Component {
         
         return (
             <div className="App">
-                <h1>Flame Rouge</h1>
+                <img class="backgroundImage" src={require('./Images/flameRougeBackground.png')} />
+                <h1 className="mainTitle">Flame Rouge</h1>
 
                 <Help
                     helpMenu = {this.state.helpMenu}
