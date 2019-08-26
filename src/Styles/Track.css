@@ -18,6 +18,11 @@
     min-height: 100%;
 }
 
+.track-segment-counter {
+    border: none;
+    color: #f00;
+}
+
 .track-segment-player-0{
     background-color: #88f;
 }

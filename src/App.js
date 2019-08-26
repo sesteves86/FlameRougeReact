@@ -56,7 +56,7 @@ class App extends Component {
     }
 
     makeDecision = (key, value) => {
-        console.log("Starting state at makeDecision()");
+        console.log("makeDecision()");
         
         if (!this.state.activePlayer === 0){
             return;
@@ -69,7 +69,7 @@ class App extends Component {
             stateUpdate = this.state.gameEngine.setHumanDecision(true, value);
         } else {
             stateUpdate = this.state.gameEngine.setHumanDecision(false, value);
-            stateUpdate = this.state.gameEngine.processRestOfTurn(stateUpdate, this.state.riders);
+            stateUpdate = this.state.gameEngine.processRestOfTurn(stateUpdate, this.state.riders, this.state.trackHills);
 
             state2.riders = stateUpdate.riders;
         }

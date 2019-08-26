@@ -7,20 +7,29 @@ class Player extends Component {
     let trackRender = [];
     let trackLane = [];
     
-    for (let lane = 0; lane < 2; lane++) {
+    for (let lane = 0; lane < 3; lane++) {
       trackLane = [];
 
       for (let segment = 0; segment < trackLength; segment++) { 
-        trackLane.push(
-          {
-            className: "track-segment track-segment-" + lane + "-" + segment + " " + 
-                            (trackHills.up.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
-                            "track-up" : "") +
-                            (trackHills.down.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
-                            "track-down" : ""),
-            rider: ""
-          }
-        );
+        if (lane<2) {
+          trackLane.push(
+            {
+              className: "track-segment track-segment-" + lane + "-" + segment + " " + 
+                              (trackHills.up.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
+                              "track-up" : "") +
+                              (trackHills.down.filter(t => t >=  segment - 5 && t < segment ).length > 0 ? 
+                              "track-down" : ""),
+              rider: ""
+            }
+          );
+        } else {
+          trackLane.push(
+            {
+              className: "track-segment track-segment-counter",
+              rider: ""
+            }
+          );
+        }
       }
 
       trackRender.push(trackLane);
@@ -48,6 +57,12 @@ class Player extends Component {
         }
         track[lane][rider.positionX].className += " track-segment-player-" + rider.player;
         track[lane][rider.positionX].rider = rider.isSprinter ? "S" : "R";
+      }
+
+      // To move out
+      // Number the spaces
+      for (var i = 0; i<70; i++) {
+        track[2][i].rider = ((i+1)%5 === 0 ? (i+1) : "");
       }
     };
 

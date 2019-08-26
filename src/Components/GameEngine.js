@@ -24,12 +24,12 @@ class GameEngine {
         }
     }
 
-    processRestOfTurn(stateUpdate, riders) {
+    processRestOfTurn(stateUpdate, riders, trackHills) {
         console.log("processRestOfTurn");
         this._getAIDecisions(riders);
         
         var ridersDeepCopy =_deepCopyRiders(riders);
-        stateUpdate.riders = this._processDecisions(ridersDeepCopy);
+        stateUpdate.riders = this._processDecisions(ridersDeepCopy, trackHills);
         stateUpdate = this._processTurn(stateUpdate);
         this._resetDecisions();
 
@@ -69,7 +69,7 @@ class GameEngine {
         
     }
 
-    _processDecisions(riders) {
+    _processDecisions(riders, trackHills) {
         console.log("_processDecisions");
         var trackPosition = [];
 
@@ -109,13 +109,37 @@ class GameEngine {
                 d.player === rider.player &&
                 d.isSprinter === rider.isSprinter)[0].decision;
 
+            // Add downhill logic
+            var isDownHill = false;
+            var isUpHill = false;
+
+            trackHills.down.forEach(d => {
+                if (rider.positionX >= d && rider.positionX < d + 5) {
+                    isDownHill = true;
+                }
+            });
+            trackHills.up.forEach(d => {
+                if (rider.positionX >= d && rider.positionX < d + 5) {
+                    isUpHill = true;
+                }
+            });
+            
+
+            if (isDownHill && decision < 5) {
+                decision = 5;
+            }
+
+            if (isUpHill && decision > 5) {
+                decision = 5;
+            }
+
             var targetPosition = rider.positionX + decision;
             var finishLoop = false;
-            
+
             do { 
                 if (trackPosition.filter( t =>
                     t.position === targetPosition
-                ).length < 2 ) { // move here
+                ).length < 2 ) { // If there's a free space, move to target position
                     rider.setPosition(targetPosition);
                     var tIndex = trackPosition.findIndex( t =>
                         t.isSprinter == rider.isSprinter && 

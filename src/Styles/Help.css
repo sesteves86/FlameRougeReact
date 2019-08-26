@@ -1,3 +1,18 @@
+.help-close {
+    border: 2px solid #f22;
+    border-radius: 50%;
+    color: #f22;
+    cursor: pointer;
+    font-weight: bold;
+    height: 20px;
+    margin: 5px 10px 5px auto;
+    text-align: center;
+    width: 20px;
+}
+.help-close:hover {
+    background-color: #faa;
+}
+
 .help-menu-container {
     background-color: #ccc;
     border: 3px solid #555;
@@ -9,15 +24,18 @@
 }
 
 .help-toggle-button {
-    background-color: #cfc;
-    border: 3px solid #0c0;
+    background-color: #ccf;
+    border: 3px solid #00f;
     border-radius: 15px;
+    color: #00f;
     cursor: pointer;
+    font-weight: bold;
     height: 30px;
-    margin: 10px auto;
-    width: 200px;
+    margin: 10px 5% 10px auto;
+    vertical-align: middle;
+    width: 70px;
 }
 
 .help-toggle-button:hover {
-    background-color: #8c8;
+    background-color: #aaf;
 }
