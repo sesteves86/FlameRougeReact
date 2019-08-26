@@ -71,9 +71,10 @@ class Player extends Component {
 
   render() {
     let trackRender = this.assignPositions(this.props.trackHills);
+    var trackContainerClassName = "track " + (this.props.helpMenu ? "hidden" : "");
 
     return (
-      <div className="track">
+      <div className={trackContainerClassName}>
         { trackRender.map( (lane, i) => (
           <div className="track-lane" key={i}>
             { lane.map( (segment, i2) => (

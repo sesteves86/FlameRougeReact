@@ -108,28 +108,33 @@ class App extends Component {
                 hasFinished = { this.state.hasFinished}
             />
         ), this);
+
+        var playerContainerClassName = "playersContainer " + (this.state.helpMenu ? "hidden" : "");
         
         return (
             <div className="App">
                 <img class="backgroundImage" src={require('./Images/flameRougeBackground.png')} />
                 <h1 className="mainTitle">Flame Rouge</h1>
 
-                <Help
-                    helpMenu = {this.state.helpMenu}
-                    toggleHelp = {this.toggleHelp}
-                />
-                
                 <Track 
                     riders = {this.state.riders}
                     trackHills = {this.state.trackHills}
+                    helpMenu = {this.state.helpMenu}
                 />
-                <div className = "playersContainer" >
+                <div className = {playerContainerClassName} >
                     { renderedPlayers }
                 </div>
 
                 <WinnerScreen
                     hasFinished = {this.state.hasFinished}
                     winningPlayer = {this.state.winner}
+                    riders = {this.state.riders}
+                    helpMenu = {this.state.helpMenu}
+                />
+
+                <Help
+                    helpMenu = {this.state.helpMenu}
+                    toggleHelp = {this.toggleHelp}
                 />
             </div>
         );
