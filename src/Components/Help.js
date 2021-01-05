@@ -48,7 +48,7 @@ const Help = ({helpMenu, toggleHelp}) => {
 
 Help.propTypes = {
     helpMenu: PropTypes.bool,
-    toggleHelp: PropTypes.bool
+    toggleHelp: PropTypes.func
 }
 
 export default Help;

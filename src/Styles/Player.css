@@ -17,10 +17,13 @@ button:hover{
     height: 50vh;
 }
 
+.player-number{
+    margin-top: 5px;
+}
+
 .player-option{
     display: flex;
-    
-}
+    }
 
 .hidden{
     display: none !important;
