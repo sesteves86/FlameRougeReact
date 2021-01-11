@@ -25,8 +25,8 @@ class Rider {
 
     getTired() {
         this.cards.push(2);
-        console.log("Player " + this.player + ", " + this.isSprinter + ", got fatigued.");
-        console.log(this.cards);
+        // console.log("Player " + this.player + ", " + this.isSprinter + ", got fatigued.");
+        // console.log(this.cards);
     }
 
     getTopCard(){
