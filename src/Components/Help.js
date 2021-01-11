@@ -2,29 +2,21 @@ import React, {useEffect} from 'react';
 import PropTypes from "prop-types";
 import './../Styles/Help.css';
 
-const Help = ({helpMenu, toggleHelp}) => {
+const Help = ({setActiveScreen, menu, activeScreen}) => {
 
     const onClick = () => {
-        toggleHelp();
+        setActiveScreen(menu.startingMenu);
     }
-
-    var openClassName;
-    var containerClassName;
-     
-    useEffect( () => {
-        openClassName = "help-toggle-button " +  (helpMenu ? "hidden" : "");
-        containerClassName = "help-menu-container " + (helpMenu ? "" : "hidden");
-    }, [helpMenu]);
 
     return (
         <div>
-            <div 
-                className = {openClassName}
+            {/* <div 
+                className = "help-toggle-button"
                 onClick = { () => onClick()}
                 >
                 Rules
-            </div>
-            <div className={containerClassName}>
+            </div> */}
+            <div className="help-menu-container">
                 <div className="help-close"
                     onClick = { () => onClick()}
                     >X</div>
@@ -47,8 +39,9 @@ const Help = ({helpMenu, toggleHelp}) => {
 };
 
 Help.propTypes = {
-    helpMenu: PropTypes.bool,
-    toggleHelp: PropTypes.func
+    activeScreen: PropTypes.string,
+    setActiveScreen: PropTypes.func,
+    menu: PropTypes.shape(PropTypes.any)
 }
 
 export default Help;

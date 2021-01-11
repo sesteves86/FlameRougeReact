@@ -1,16 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './../Styles/Track.css';
 import PropTypes from 'prop-types';
 
 const Track = (({trackHills, helpMenu, riders}) => {
-
-    let trackRender = [];
-    let trackContainerClassName;
+    const [trackRender, setTrackRender] = useState([]);
 
     useEffect(() => {
-        trackRender = assignPositions(trackHills);
-        trackContainerClassName = "track " + (helpMenu ? "hidden" : "");
-    }, [trackHills, helpMenu]);
+        setTrackRender(assignPositions(trackHills));
+    }, [trackHills, riders]);
 
     const initialisePositions = ((trackLength, trackHills) => {
         let trackRender = [];
@@ -78,7 +75,7 @@ const Track = (({trackHills, helpMenu, riders}) => {
 
 
     return (
-        <div className={trackContainerClassName}>
+        <div className="track">
             { trackRender.map( (lane, i) => (
                 <div className="track-lane" key={i}>
                     { lane.map( (segment, i2) => (
@@ -93,8 +90,7 @@ const Track = (({trackHills, helpMenu, riders}) => {
 });
 
 Track.propTypes = {
-    trackHills: PropTypes.arrayOf(PropTypes.any), 
-    helpMenu: PropTypes.bool, 
+    trackHills: PropTypes.shape(PropTypes.any),
     riders: PropTypes.arrayOf(PropTypes.any)
 }
 

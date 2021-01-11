@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import GameEngine from './Components/GameEngine';
 import Help from './Components/Help';
+import StartingMenu from './Components/StartingMenu';
 import Player from './Components/Player';
 import Rider from './Components/Rider';
 import Track from './Components/Track';
@@ -29,11 +30,18 @@ const App = ( () => {
         }
     ];
 
+    const menu = {
+        startingMenu: "Starting Menu",
+        game: "Game",
+        rules: "Rules",
+        winner: "Winner"
+    };
+
     const [ activePlayer, setActivePlayer] = useState(0);
     const [ activePrimaryRider, setActivePrimaryRider] = useState(true);
     const [ gameEngine, setGameEngine] = useState(new GameEngine());
     const [ hasFinished, setHasFinished] = useState(false);
-    const [ helpMenu, setHelpMenu] = useState(false);
+    const [ activeScreen, setActiveScreen] = useState(menu.startingMenu);
     const [ riders, setRiders] = useState([
         new Rider( 0 , 3, 0, true),
         new Rider( 0 , 0, 1, false),
@@ -51,8 +59,6 @@ const App = ( () => {
     const [ winner, setWinner] = useState(5);
 
     const makeDecision = (key, value) => {
-        console.log("makeDecision()");
-        
         // not human
         if (!activePlayer === 0) { 
             return;
@@ -76,15 +82,14 @@ const App = ( () => {
         var winningPlayer = riders.filter( r => r.positionX === maxPosition)[0].player;
 
         if (maxPosition >= 70) {
-            stateUpdate.hasFinished = true;
-            stateUpdate.winner = winningPlayer;
+            // stateUpdate.hasFinished = true;
+            // stateUpdate.winner = winningPlayer;
+            setHasFinished(true)
+            setWinner(winningPlayer);
+            setActiveScreen(menu.winner);
         }
 
         console.log("Finished making decision");
-    };
-
-    const toggleHelp = () => {
-        setHelpMenu(!helpMenu);
     };
 
     const renderedPlayers = players.map( (p) => (
@@ -100,33 +105,47 @@ const App = ( () => {
         />
     ), this);
 
-    var playerContainerClassName = "playersContainer " + (helpMenu ? "hidden" : "");
-
     return (
         <div className="App">
             <img className="backgroundImage" src={require('./Images/flameRougeBackground.png')} alt="background"/>
             <h1 className="mainTitle">Flame Rouge</h1>
 
-            <Track 
-                riders = {riders}
-                trackHills = {trackHills}
-                helpMenu = {helpMenu}
-            />
-            <div className = {playerContainerClassName} >
-                { renderedPlayers }
-            </div>
+            {activeScreen === menu.startingMenu && 
+                <StartingMenu
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
+                />
+            }
 
-            <WinnerScreen
-                hasFinished = {hasFinished}
-                winningPlayer = {winner}
-                riders = {riders}
-                helpMenu = {helpMenu}
-            />
+            {activeScreen === menu.game && 
+                <Fragment>
+                    <Track 
+                        riders = {riders}
+                        trackHills = {trackHills}
+                    />
+                    <div className = "playersContainer" >
+                        { renderedPlayers }
+                </div>
+                </Fragment>
+            }
 
-            <Help
-                helpMenu = {helpMenu}
-                toggleHelp = {toggleHelp}
-            />
+            {activeScreen === menu.winner && 
+                <WinnerScreen
+                    hasFinished = {hasFinished}
+                    winningPlayer = {winner}
+                    riders = {riders}
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
+                />
+            }
+
+            {activeScreen === menu.rules && 
+                <Help
+                    setActiveScreen = {setActiveScreen}
+                    activeScreen = {activePlayer}
+                    menu = {menu}
+                />
+            }
         </div>
     );
 });

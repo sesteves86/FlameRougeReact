@@ -17,7 +17,7 @@ const Player = ({player, rider1, rider2, makeDecision, activePlayer, activePrima
         rider2.shuffle();
         setOptions1(rider1.getTop4Cards());
         setOptions2(rider2.getTop4Cards());
-    }, []);
+    }, [rider1, rider2]);
 
     const onClick = (key, value) => {
         makeDecision(key, value);
@@ -37,7 +37,7 @@ const Player = ({player, rider1, rider2, makeDecision, activePlayer, activePrima
             }
             </div>
             <div>
-                <h3>Rouler</h3>
+                <h3>Rouller</h3>
                 { player.human === true && activePlayer === player.id && !activePrimaryRider &&
                     <PlayerOptions 
                         options = {options2}
