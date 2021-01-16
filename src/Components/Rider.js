@@ -1,5 +1,8 @@
 import './../Styles/Track.css';
 
+var initialSprinterDeck =  [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9];
+var initialRoullerDeck =  [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7];
+
 class Rider {
     constructor(player, positionX, lane, isSprinter){
         this.player = player;
@@ -25,8 +28,17 @@ class Rider {
 
     getTired() {
         this.cards.push(2);
-        console.log("Player " + this.player + ", " + this.isSprinter + ", got fatigued.");
-        console.log(this.cards);
+        // console.log("Player " + this.player + ", " + this.isSprinter + ", got fatigued.");
+        // console.log(this.cards);
+    }
+
+    reset() {
+        if(this.isSprinter){
+            this.cards = initialSprinterDeck;
+        } else {
+            this.cards = initialRoullerDeck;
+        }
+
     }
 
     getTopCard(){

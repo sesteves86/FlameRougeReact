@@ -1,144 +1,172 @@
-import React, { Component } from 'react';
+import React, { useState, Fragment } from 'react';
 import GameEngine from './Components/GameEngine';
 import Help from './Components/Help';
+import StartingMenu from './Components/StartingMenu';
 import Player from './Components/Player';
 import Rider from './Components/Rider';
+import SplashScreen from './Components/SplashScreen';
 import Track from './Components/Track';
 import WinnerScreen from './Components/WinnerScreen';
 import './App.css';
 
-class App extends Component {
-    constructor (props){
-        super(props);
+const App = ( () => {
 
-        this.state = 
+    const players= 
+    [
         {
-            activePlayer: 0,
-            activePrimaryRider: true,
-            gameEngine: new GameEngine(),
-            hasFinished: false,
-            helpMenu: false,
-            riders: [
-                new Rider( 0 , 3, 0, true),
-                new Rider( 0 , 0, 1, false),
-                new Rider( 1 , 2, 0, true),
-                new Rider( 1 , 1, 1, false),
-                new Rider( 2 , 1, 0, true),
-                new Rider( 2 , 2, 1, false),
-                new Rider( 3 , 0, 0, true),
-                new Rider( 3 , 3, 1, false)
-            ],
-            players: 
-            [
-                {
-                    id: 0,
-                    human: true
-                },
-                {
-                    id: 1,
-                    human: false
-                },
-                {
-                    id: 2,
-                    human: false
-                },
-                {
-                    id: 3,
-                    human: false
-                }
-            ],
-            trackHills: {
-                up: [15, 40],
-                down: [10, 45]
-            },
-            winner: 5
-        };
+            id: 0,
+            human: true
+        },
+        {
+            id: 1,
+            human: false
+        },
+        {
+            id: 2,
+            human: false
+        },
+        {
+            id: 3,
+            human: false
+        }
+    ];
+
+    const initialRidersPosition = [
+        new Rider( 0 , 3, 0, true),
+        new Rider( 0 , 0, 1, false),
+        new Rider( 1 , 2, 0, true),
+        new Rider( 1 , 1, 1, false),
+        new Rider( 2 , 1, 0, true),
+        new Rider( 2 , 2, 1, false),
+        new Rider( 3 , 0, 0, true),
+        new Rider( 3 , 3, 1, false)
+    ]
+
+    const menu = {
+        splashScreen: "Splash Screen",
+        startingMenu: "Starting Menu",
+        game: "Game",
+        rules: "Rules",
+        winner: "Winner"
+    };
+
+    const [ activePlayer, setActivePlayer] = useState(0);
+    const [ activePrimaryRider, setActivePrimaryRider] = useState(true);
+    const [ gameEngine, setGameEngine] = useState(new GameEngine());
+    const [ hasFinished, setHasFinished] = useState(false);
+    const [ activeScreen, setActiveScreen] = useState(menu.splashScreen);
+    const [ riders, setRiders] = useState(initialRidersPosition);
+    const [ trackHills, setTrackHills] = useState({
+        up: [15, 40],
+        down: [10, 45]
+    });
+    const [ winner, setWinner] = useState(5);
+
+    const resetRace = () => {
+        setRiders(initialRidersPosition);
+        //remove fatigue cards
+        riders.forEach(p => {
+            p.reset();
+        });
     }
 
-    makeDecision = (key, value) => {
-        console.log("makeDecision()");
-        
-        if (!this.state.activePlayer === 0){
+    const makeDecision = (key, value) => {
+        // not human
+        if (!activePlayer === 0) { 
             return;
         }
 
-        let state2 = Object.assign({}, this.state);
         let stateUpdate = {};
 
-        if (this.state.activePrimaryRider === true) {
-            stateUpdate = this.state.gameEngine.setHumanDecision(true, value);
+        if (activePrimaryRider === true) {
+            stateUpdate = gameEngine.setHumanDecision(true, value);
         } else {
-            stateUpdate = this.state.gameEngine.setHumanDecision(false, value);
-            stateUpdate = this.state.gameEngine.processRestOfTurn(stateUpdate, this.state.riders, this.state.trackHills);
+            stateUpdate = gameEngine.setHumanDecision(false, value);
+            stateUpdate = gameEngine.processRestOfTurn(stateUpdate, riders, trackHills);
 
-            state2.riders = stateUpdate.riders;
+            setRiders(stateUpdate.riders);
         }
 
-        state2.activePrimaryRider = stateUpdate.activePrimaryRider;
-        state2.activePlayer = stateUpdate.activePlayer;
+        setActivePrimaryRider(stateUpdate.activePrimaryRider);
+        setActivePlayer(stateUpdate.activePlayer);
 
-        var maxPosition = Math.max.apply(Math, state2.riders.map(function(o) { return o.positionX; }));
-        var winningPlayer = state2.riders.filter( r => r.positionX === maxPosition)[0].player;
+        var maxPosition = Math.max.apply(Math, riders.map(function(o) { return o.positionX; }));
+        var winningPlayer = riders.filter( r => r.positionX === maxPosition)[0].player;
 
         if (maxPosition >= 70) {
-            state2.hasFinished = true;
-            state2.winner = winningPlayer;
+            // stateUpdate.hasFinished = true;
+            // stateUpdate.winner = winningPlayer;
+            setHasFinished(true)
+            setWinner(winningPlayer);
+            setActiveScreen(menu.winner);
         }
 
-        this.setState(state2);
-
         console.log("Finished making decision");
-    }
+    };
 
-    toggleHelp = () => {
-        this.state.helpMenu = !this.state.helpMenu;
-        this.setState(this.state);
-    }
+    const renderedPlayers = players.map( (p) => (
+        <Player
+            key = { p.id }
+            player = { p } 
+            rider1 = { riders.filter( r => r.player === p.id && r.isSprinter === true )[0] } 
+            rider2 = { riders.filter( r => r.player === p.id && r.isSprinter === false )[0] }
+            makeDecision = { makeDecision }
+            activePlayer = { activePlayer }
+            activePrimaryRider = { activePrimaryRider }
+            hasFinished = { hasFinished}
+        />
+    ), this);
 
-    render() {
-        const renderedPlayers = this.state.players.map( (p) => (
-            <Player
-                key = { p.id }
-                player = { p } 
-                rider1 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === true ) } 
-                rider2 = { this.state.riders.filter( r => r.player === p.id && r.isSprinter === false ) }
-                makeDecision = { this.makeDecision }
-                activePlayer = { this.state.activePlayer }
-                activePrimaryRider = { this.state.activePrimaryRider }
-                hasFinished = { this.state.hasFinished}
-            />
-        ), this);
+    return (
+        <div className="App">
+            <img className="backgroundImage" src={require('./Images/flameRougeBackground.png')} alt="background"/>
+            <h1 className="mainTitle">Flame Rouge</h1>
 
-        var playerContainerClassName = "playersContainer " + (this.state.helpMenu ? "hidden" : "");
-        
-        return (
-            <div className="App">
-                <img class="backgroundImage" src={require('./Images/flameRougeBackground.png')} />
-                <h1 className="mainTitle">Flame Rouge</h1>
-
-                <Track 
-                    riders = {this.state.riders}
-                    trackHills = {this.state.trackHills}
-                    helpMenu = {this.state.helpMenu}
+            {activeScreen === menu.splashScreen && 
+                <SplashScreen 
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
                 />
-                <div className = {playerContainerClassName} >
-                    { renderedPlayers }
+            }
+            {activeScreen === menu.startingMenu && 
+                <StartingMenu
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
+                />
+            }
+
+            {activeScreen === menu.game && 
+                <Fragment>
+                    <Track 
+                        riders = {riders}
+                        trackHills = {trackHills}
+                    />
+                    <div className = "playersContainer" >
+                        { renderedPlayers }
                 </div>
+                </Fragment>
+            }
 
+            {activeScreen === menu.winner && 
                 <WinnerScreen
-                    hasFinished = {this.state.hasFinished}
-                    winningPlayer = {this.state.winner}
-                    riders = {this.state.riders}
-                    helpMenu = {this.state.helpMenu}
+                    hasFinished = {hasFinished}
+                    winningPlayer = {winner}
+                    riders = {riders}
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
+                    resetRace = {resetRace}
                 />
+            }
 
+            {activeScreen === menu.rules && 
                 <Help
-                    helpMenu = {this.state.helpMenu}
-                    toggleHelp = {this.toggleHelp}
+                    setActiveScreen = {setActiveScreen}
+                    activeScreen = {activePlayer}
+                    menu = {menu}
                 />
-            </div>
-        );
-    }
-}
+            }
+        </div>
+    );
+});
 
 export default App;

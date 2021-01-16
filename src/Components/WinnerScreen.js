@@ -9,7 +9,7 @@ class WinnerScreen extends Component {
 
         var listWinners = this.props.riders.filter( r => r.positionX > 70);
         
-        const compVisibility = "winner " + (this.props.hasFinished ? "" : "hidden") + " winner-" + this.props.winningPlayer;
+        const compVisibility = "winner winner-" + this.props.winningPlayer;
 
         return (
             <div className={compVisibility}>
@@ -18,7 +18,11 @@ class WinnerScreen extends Component {
                         rider = {r}
                     />)
                 })}
-                { mainText }
+                <p>{ mainText }</p>
+                <button onClick={() => {
+                    this.props.setActiveScreen(this.props.menu.startingMenu);
+                    this.props.resetRace();
+                }}>Back to Main Menu</button>
             </div>
         );
     }
