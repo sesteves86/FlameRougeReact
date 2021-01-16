@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import PropTypes from "prop-types";
 import './../Styles/Help.css';
 
@@ -10,12 +10,6 @@ const Help = ({setActiveScreen, menu, activeScreen}) => {
 
     return (
         <div>
-            {/* <div 
-                className = "help-toggle-button"
-                onClick = { () => onClick()}
-                >
-                Rules
-            </div> */}
             <div className="help-menu-container">
                 <div className="help-close"
                     onClick = { () => onClick()}

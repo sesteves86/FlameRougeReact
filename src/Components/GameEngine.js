@@ -25,7 +25,6 @@ class GameEngine {
     }
 
     processRestOfTurn(stateUpdate, riders, trackHills) {
-        console.log("processRestOfTurn");
         this._getAIDecisions(riders);
         
         var ridersDeepCopy =_deepCopyRiders(riders);
@@ -33,9 +32,16 @@ class GameEngine {
         stateUpdate = this._processTurn(stateUpdate);
         this._resetDecisions();
 
-        console.log("End of processRestOfTurn");
-
         return stateUpdate;
+    }
+
+    _getTopCards(riders, player, isSprinter, nCards=4) {
+        var cards = riders.filter(r => 
+            r.player === player 
+            && r.isSprinter === isSprinter
+        )[0].cards;
+
+        return cards.slice(0, nCards);
     }
 
     /* Private functions*/
@@ -46,18 +52,12 @@ class GameEngine {
 
         //Need to have access to players data to make AI decisions?
         for (var p = 1; p < 4; p++) { // foreach AI
-            
-            var cards1 = riders.filter(r => 
-                r.player === p 
-                && r.isSprinter == true
-            )[0].cards;
+            var cards1 = this._getTopCards(riders, p, true);
             var cardChosenIndex1 = Math.floor(Math.random() * cards1.length);
 
-            var cards2 = riders.filter(r => 
-                r.player === p 
-                && r.isSprinter == false
-            )[0].cards;
+            var cards2 = this._getTopCards(riders, p, false);
             var cardChosenIndex2 = Math.floor(Math.random() * cards2.length);
+
             if( cards1[cardChosenIndex1] === undefined || cards2[cardChosenIndex2] === undefined) {
                 console.error("Bad AI decision");
                 debugger;
@@ -66,7 +66,23 @@ class GameEngine {
             this.decisions.push({player: p, isSprinter: true, decision: cards1[cardChosenIndex1] });
             this.decisions.push({player: p, isSprinter: false, decision: cards2[cardChosenIndex2] });
         }
-        
+    }
+
+    _getRider(riders, player, isSprinter) {
+        var rider = riders.filter( r => 
+            r.player === player && 
+            r.isSprinter === (isSprinter===0 ? true : false)
+        )[0];
+
+        return rider;
+    }
+
+    _getDecision(player, isSprinter) {
+        const decision = this.decisions.filter( d => 
+            d.player === player &&
+            d.isSprinter === (isSprinter===0 ? true : false))[0];
+
+        return decision;
     }
 
     _processDecisions(riders, trackHills) {
@@ -76,14 +92,8 @@ class GameEngine {
         // Use Cards and Write to trackPosition
         for (var player=0; player<4; player++) {
             for (var isSprinter = 0; isSprinter < 2; isSprinter++) {
-                var rider = riders.filter( r => 
-                    r.player === player && 
-                    r.isSprinter == isSprinter
-                )[0];
-
-                var decision = this.decisions.filter( d => 
-                        d.player === player &&
-                        d.isSprinter == isSprinter)[0];
+                var rider = this._getRider(riders, player, isSprinter);
+                var decision = this._getDecision(player, isSprinter);
             
                 rider.useCard(decision.decision);
 
@@ -136,13 +146,17 @@ class GameEngine {
             var targetPosition = rider.positionX + decision;
             var finishLoop = false;
 
-            do { 
-                if (trackPosition.filter( t =>
+            var hasSlipstream = () => {
+                return trackPosition.filter( t =>
                     t.position === targetPosition
-                ).length < 2 ) { // If there's a free space, move to target position
+                    ).length < 2;
+            };
+
+            do { 
+                if (hasSlipstream()) { // If there's a free space, move to target position
                     rider.setPosition(targetPosition);
                     var tIndex = trackPosition.findIndex( t =>
-                        t.isSprinter == rider.isSprinter && 
+                        t.isSprinter === (rider.isSprinter ? 0 : 1)  && 
                         t.player === rider.player
                         );
                     trackPosition[tIndex].position = targetPosition;
@@ -156,7 +170,6 @@ class GameEngine {
             } while (!finishLoop)
         }, this);
 
-        console.log("drag");
         // drag riders 
         var sortedTrackPositions = trackPosition.sort(
             function(t1, t2) {
@@ -177,10 +190,9 @@ class GameEngine {
                 var lPos = pos;
 
                 // move up current rider
-                
                 var riderIndex = riders.findIndex( r => 
                     r.player === sortedTrackPositions[i].player 
-                    && r.isSprinter == sortedTrackPositions[i].isSprinter
+                    && r.isSprinter === (sortedTrackPositions[i].isSprinter === 0 ? false : true)
                 )
 
                 riders[riderIndex].positionX = pos + 1;
@@ -196,12 +208,12 @@ class GameEngine {
                     if (testPos > lPos - 2) { //within drag range
                         lPos = testPos;
                         // Move riders
-                        var riderIndex = riders.findIndex( r => 
+                        var riderIndex2 = riders.findIndex( r => 
                             r.player === sortedTrackPositions[j].player 
-                            && r.isSprinter == sortedTrackPositions[j].isSprinter
+                            && r.isSprinter === (sortedTrackPositions[j].isSprinter === 0 ? false : true)
                         )
-
-                        riders[riderIndex].positionX = lPos + 1;
+                        
+                        riders[riderIndex2].positionX = lPos + 1;
 
                         // update track position
                         sortedTrackPositions[j].position = lPos + 1;
@@ -214,17 +226,15 @@ class GameEngine {
         }
 
         // fatigue riders
-        console.log("fatigue");
-        
         sortedTrackPositions.forEach( function(trackPosition, index) {
             if (sortedTrackPositions.filter(t =>
                 t.position === trackPosition.position + 1
             ).length <= 0 ) { //in front of the pack
                 var riderIndex = riders.findIndex( r => 
                     r.player === sortedTrackPositions[index].player 
-                    && r.isSprinter == sortedTrackPositions[index].isSprinter
+                    && r.isSprinter === (sortedTrackPositions[index].isSprinter === 0 ? false : true)
                 )
-
+                
                 riders[riderIndex].getTired();
             }
         }, this);
@@ -260,8 +270,8 @@ function _deepCopyRiders(riders) {
 
     clonedRiders.forEach(function(clonedRider) {
         var originalRider = riders.filter( r => 
-            r.isSprinter == clonedRider.isSprinter &&
-            r.player == clonedRider.player);
+            r.isSprinter === clonedRider.isSprinter &&
+            r.player === clonedRider.player);
 
         var deepCopy = _deepCopyObject(originalRider[0]);
 

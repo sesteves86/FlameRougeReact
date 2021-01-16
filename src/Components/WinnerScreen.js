@@ -21,6 +21,7 @@ class WinnerScreen extends Component {
                 <p>{ mainText }</p>
                 <button onClick={() => {
                     this.props.setActiveScreen(this.props.menu.startingMenu);
+                    this.props.resetRace();
                 }}>Back to Main Menu</button>
             </div>
         );

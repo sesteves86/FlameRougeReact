@@ -4,6 +4,7 @@ import Help from './Components/Help';
 import StartingMenu from './Components/StartingMenu';
 import Player from './Components/Player';
 import Rider from './Components/Rider';
+import SplashScreen from './Components/SplashScreen';
 import Track from './Components/Track';
 import WinnerScreen from './Components/WinnerScreen';
 import './App.css';
@@ -30,7 +31,19 @@ const App = ( () => {
         }
     ];
 
+    const initialRidersPosition = [
+        new Rider( 0 , 3, 0, true),
+        new Rider( 0 , 0, 1, false),
+        new Rider( 1 , 2, 0, true),
+        new Rider( 1 , 1, 1, false),
+        new Rider( 2 , 1, 0, true),
+        new Rider( 2 , 2, 1, false),
+        new Rider( 3 , 0, 0, true),
+        new Rider( 3 , 3, 1, false)
+    ]
+
     const menu = {
+        splashScreen: "Splash Screen",
         startingMenu: "Starting Menu",
         game: "Game",
         rules: "Rules",
@@ -41,22 +54,21 @@ const App = ( () => {
     const [ activePrimaryRider, setActivePrimaryRider] = useState(true);
     const [ gameEngine, setGameEngine] = useState(new GameEngine());
     const [ hasFinished, setHasFinished] = useState(false);
-    const [ activeScreen, setActiveScreen] = useState(menu.startingMenu);
-    const [ riders, setRiders] = useState([
-        new Rider( 0 , 3, 0, true),
-        new Rider( 0 , 0, 1, false),
-        new Rider( 1 , 2, 0, true),
-        new Rider( 1 , 1, 1, false),
-        new Rider( 2 , 1, 0, true),
-        new Rider( 2 , 2, 1, false),
-        new Rider( 3 , 0, 0, true),
-        new Rider( 3 , 3, 1, false)
-    ]);
+    const [ activeScreen, setActiveScreen] = useState(menu.splashScreen);
+    const [ riders, setRiders] = useState(initialRidersPosition);
     const [ trackHills, setTrackHills] = useState({
         up: [15, 40],
         down: [10, 45]
     });
     const [ winner, setWinner] = useState(5);
+
+    const resetRace = () => {
+        setRiders(initialRidersPosition);
+        //remove fatigue cards
+        riders.forEach(p => {
+            p.reset();
+        });
+    }
 
     const makeDecision = (key, value) => {
         // not human
@@ -110,6 +122,12 @@ const App = ( () => {
             <img className="backgroundImage" src={require('./Images/flameRougeBackground.png')} alt="background"/>
             <h1 className="mainTitle">Flame Rouge</h1>
 
+            {activeScreen === menu.splashScreen && 
+                <SplashScreen 
+                    setActiveScreen = {setActiveScreen}
+                    menu = {menu}
+                />
+            }
             {activeScreen === menu.startingMenu && 
                 <StartingMenu
                     setActiveScreen = {setActiveScreen}
@@ -136,6 +154,7 @@ const App = ( () => {
                     riders = {riders}
                     setActiveScreen = {setActiveScreen}
                     menu = {menu}
+                    resetRace = {resetRace}
                 />
             }
 

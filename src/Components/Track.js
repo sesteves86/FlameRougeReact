@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './../Styles/Track.css';
 import PropTypes from 'prop-types';
 
-const Track = (({trackHills, helpMenu, riders}) => {
+const Track = (({trackHills, riders}) => {
     const [trackRender, setTrackRender] = useState([]);
 
     useEffect(() => {
