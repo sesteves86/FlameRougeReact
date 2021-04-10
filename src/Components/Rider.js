@@ -4,16 +4,29 @@ var initialSprinterDeck =  [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9];
 var initialRoullerDeck =  [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7];
 
 class Rider {
-    constructor(player, positionX, lane, isSprinter){
+    constructor(id, player, positionX, lane, name, customDeck){
+        this.id = id;
         this.player = player;
         this.positionX = positionX;
         this.lane = lane;
-        this.isSprinter = isSprinter;
-        this.cards = isSprinter ? 
-                    [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9] :
-                    [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7];
+        this.name = name;
+        this.cards = this.setupInitialCards(name, customDeck);
         this.cardsDiscarded  = [];
         this.nextMove = 0;
+    }
+
+    setupInitialCards(name, customDeck) {
+        if (customDeck) {
+            return JSON.parse(JSON.stringify(customDeck));
+        }
+        if(name === "Sprinter"){
+            return initialSprinterDeck;
+        }
+        if(!customDeck && name === "Rouller") {
+            return initialRoullerDeck;
+        }
+
+        return [];
     }
 
     shuffle(){
@@ -33,7 +46,7 @@ class Rider {
     }
 
     reset() {
-        if(this.isSprinter){
+        if(this.customDeck){
             this.cards = initialSprinterDeck;
         } else {
             this.cards = initialRoullerDeck;

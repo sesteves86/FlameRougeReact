@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import GameEngine from './Components/GameEngine';
 import Help from './Components/Help';
+import Game from './Components/Game';
 import StartingMenu from './Components/StartingMenu';
 import Player from './Components/Player';
 import Rider from './Components/Rider';
@@ -32,14 +33,14 @@ const App = ( () => {
     ];
 
     const initialRidersPosition = [
-        new Rider( 0 , 3, 0, true),
-        new Rider( 0 , 0, 1, false),
-        new Rider( 1 , 2, 0, true),
-        new Rider( 1 , 1, 1, false),
-        new Rider( 2 , 1, 0, true),
-        new Rider( 2 , 2, 1, false),
-        new Rider( 3 , 0, 0, true),
-        new Rider( 3 , 3, 1, false)
+        new Rider( 0 , 3, 0, "Sprinter"),
+        new Rider( 0 , 0, 1, "Rouller"),
+        new Rider( 1 , 2, 0, "Sprinter"),
+        new Rider( 1 , 1, 1, "Rouller"),
+        new Rider( 2 , 1, 0, "Sprinter"),
+        new Rider( 2 , 2, 1, "Rouller"),
+        new Rider( 3 , 0, 0, "Sprinter"),
+        new Rider( 3 , 3, 1, "Rouller")
     ]
 
     const menu = {
@@ -51,10 +52,11 @@ const App = ( () => {
     };
 
     const [ activePlayer, setActivePlayer] = useState(0);
-    const [ activePrimaryRider, setActivePrimaryRider] = useState(true);
+    const [ activePrimaryRider, setActivePrimaryRider] = useState(true); //ToDo: Rename
     const [ gameEngine, setGameEngine] = useState(new GameEngine());
     const [ hasFinished, setHasFinished] = useState(false);
-    const [ activeScreen, setActiveScreen] = useState(menu.splashScreen);
+    const [ activeScreen, setActiveScreen] = useState(menu.game);
+    // const [ activeScreen, setActiveScreen] = useState(menu.splashScreen);
     const [ riders, setRiders] = useState(initialRidersPosition);
     const [ trackHills, setTrackHills] = useState({
         up: [15, 40],
@@ -64,9 +66,9 @@ const App = ( () => {
 
     const resetRace = () => {
         setRiders(initialRidersPosition);
-        //remove fatigue cards
-        riders.forEach(p => {
-            p.reset();
+        
+        riders.forEach(rider => {
+            rider.reset();
         });
     }
 
@@ -121,8 +123,9 @@ const App = ( () => {
         <div className="App">
             <img className="backgroundImage" src={require('./Images/flameRougeBackground.png')} alt="background"/>
             <h1 className="mainTitle">Flame Rouge</h1>
+            <Game />
 
-            {activeScreen === menu.splashScreen && 
+            {/* {activeScreen === menu.splashScreen && 
                 <SplashScreen 
                     setActiveScreen = {setActiveScreen}
                     menu = {menu}
@@ -164,7 +167,7 @@ const App = ( () => {
                     activeScreen = {activePlayer}
                     menu = {menu}
                 />
-            }
+            } */}
         </div>
     );
 });

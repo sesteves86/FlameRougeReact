@@ -3,21 +3,22 @@ import PropTypes from "prop-types";
 import PlayerOptions from "./PlayerOptions";
 import './../Styles/Player.css';
 
-const Player = ({player, rider1, rider2, makeDecision, activePlayer, activePrimaryRider, hasFinished}) => {
-    const [options1, setOptions1] = useState([]);
-    const [options2, setOptions2] = useState([]);
+const Player = ({player, isHuman, riders, makeDecision, activePlayer, activeRider, hasFinished}) => {
+    const [cardOptions, setCardOptions] = useState([]);
     
-    const playerClass = "player player" + player.id + (hasFinished ? " hidden" : "");
-    var playerTitle = player.human ? 
-        "Human " +  player.id :
-        "CPU " +  player.id ;
+    const playerClass = "player player" + player + (hasFinished ? " hidden" : "");
+    const playerTitle = isHuman ? 
+        "Human " +  player :
+        "CPU " +  player ;
 
     useEffect( () => {
-        rider1.shuffle();
-        rider2.shuffle();
-        setOptions1(rider1.getTop4Cards());
-        setOptions2(rider2.getTop4Cards());
-    }, [rider1, rider2]);
+        let newCardOptions = [];
+        riders.forEach(r => {
+            r.shuffle();
+            newCardOptions.push(r.getTop4Cards());
+        })
+        setCardOptions(newCardOptions);
+    }, [riders]);
 
     const onClick = (key, value) => {
         makeDecision(key, value);
@@ -26,36 +27,28 @@ const Player = ({player, rider1, rider2, makeDecision, activePlayer, activePrima
     return (
         <div className={playerClass}>
             <p className="player-number">{ playerTitle }</p>
-            <div>
-            <h3>Sprinter</h3>
-            
-            { player.human === true && activePlayer === player.id && activePrimaryRider &&
-                <PlayerOptions 
-                    options = {options1}
-                    onClick = { onClick }
-                />
-            }
-            </div>
-            <div>
-                <h3>Rouller</h3>
-                { player.human === true && activePlayer === player.id && !activePrimaryRider &&
-                    <PlayerOptions 
-                        options = {options2}
-                        onClick = { onClick }
-                    />
-                }
-            </div>
+                { riders.map(rider => (
+                    <div>
+                        <h3>{rider.name}</h3>
+                        { player.human && activePlayer === player.id && rider.id === activeRider &&
+                            <PlayerOptions 
+                                options = {cardOptions[0]}
+                                onClick = { onClick }
+                            />
+                        }
+                    </div>
+                ))}
         </div>
     );
 };
 
 Player.propTypes = {
-    player: PropTypes.shape(),
-    rider1: PropTypes.shape(),
-    rider2: PropTypes.shape(),
+    player: PropTypes.number,
+    isHuman: PropTypes.bool,
+    riders: PropTypes.shape(),
     makeDecision: PropTypes.func,
     activePlayer: PropTypes.number,
-    activePrimaryRider: PropTypes.bool,
+    activeRider: PropTypes.number,
     hasFinished: PropTypes.bool,
 }
 
