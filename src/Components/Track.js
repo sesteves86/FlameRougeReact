@@ -62,7 +62,7 @@ const Track = (({trackHills, riders}) => {
               lane = 1 ;
             }
             track[lane][rider.positionX].className += " track-segment-player-" + rider.player;
-            track[lane][rider.positionX].rider = rider.isSprinter ? "S" : "R";
+            track[lane][rider.positionX].rider = rider.name.substring(0, 1);
           }
     
           for (var i = 0; i<70; i++) {

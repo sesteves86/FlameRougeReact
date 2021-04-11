@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const PlayerOptions = ({options, onClick}) => {
+const PlayerOptions = ({options, onClick, riderId}) => {
     return (
         <div className="player-option">
             {options.map( (option, index) => (
@@ -9,7 +9,7 @@ const PlayerOptions = ({options, onClick}) => {
                     type = "button"
                     key = {index}
                     value = {option}
-                    onClick = { () => onClick(index, option)}
+                    onClick = { () => onClick(riderId, option)}
                     >{option}</button>
             ))}
         </div>

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import PlayerOptions from "./PlayerOptions";
 import './../Styles/Player.css';
 
-const Player = ({player, isHuman, riders, makeDecision, activePlayer, activeRider, hasFinished}) => {
+const Player = ({player, isHuman, riders, makeHumanDecision, activePlayer, activeRider, hasFinished}) => {
     const [cardOptions, setCardOptions] = useState([]);
     
     const playerClass = "player player" + player + (hasFinished ? " hidden" : "");
@@ -21,19 +21,20 @@ const Player = ({player, isHuman, riders, makeDecision, activePlayer, activeRide
     }, [riders]);
 
     const onClick = (key, value) => {
-        makeDecision(key, value);
+        makeHumanDecision(key, value);
     }
 
     return (
         <div className={playerClass}>
             <p className="player-number">{ playerTitle }</p>
-                { riders.map(rider => (
+                { riders.map((rider, index) => (
                     <div>
                         <h3>{rider.name}</h3>
-                        { player.human && activePlayer === player.id && rider.id === activeRider &&
+                        { isHuman && rider.id === activeRider && cardOptions[index] && cardOptions[index].length > 0 &&
                             <PlayerOptions 
-                                options = {cardOptions[0]}
+                                options = {cardOptions[index]}
                                 onClick = { onClick }
+                                riderId = {rider.id}
                             />
                         }
                     </div>
@@ -46,7 +47,7 @@ Player.propTypes = {
     player: PropTypes.number,
     isHuman: PropTypes.bool,
     riders: PropTypes.shape(),
-    makeDecision: PropTypes.func,
+    makeHumanDecision: PropTypes.func,
     activePlayer: PropTypes.number,
     activeRider: PropTypes.number,
     hasFinished: PropTypes.bool,

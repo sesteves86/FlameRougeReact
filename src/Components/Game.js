@@ -5,13 +5,11 @@ import Rider from "./Rider";
 import Track from "./Track";
 
 const Game = () => {
-    let gameEngine = {};
-
-    const [ activePlayer, setActivePlayer] = useState(0);
     const [ activeRider, setActiveRider] = useState(0);
     const [ riders, setRiders] = useState([
         new Rider( 0, 0 , 3, 0, "Sprinter"),
         new Rider( 1, 0, 0, 1, "Rouller"),
+        // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
         new Rider( 2, 1 , 2, 0, "Sprinter"),
         new Rider( 3, 1 , 1, 1, "Rouller"),
         new Rider( 4, 2 , 1, 0, "Sprinter"),
@@ -19,10 +17,12 @@ const Game = () => {
         new Rider( 6, 3 , 0, 0, "Sprinter"),
         new Rider( 7, 3 , 3, 1, "Rouller")
     ]);
-    const [ trackHills, setTrackHills] = useState({
+    const [ track, setTrackHills] = useState({
         up: [15, 40],
         down: [10, 45]
     });
+    const [gameEngine, setGameEngine] = useState({});
+
     const players = [
         {
             id: 0,
@@ -40,30 +40,39 @@ const Game = () => {
     ];
 
     useEffect(() => {
-        gameEngine = new GameEngine();
+        if (players && riders && track) {
+            setGameEngine(new GameEngine(players, riders, track));
+        }
     }, []);
 
-    const makeDecision = (riderId, value) => {
-        // not human
-        if (!activePlayer === 0) { 
-            return;
+    const getActivePlayer = () => {
+        const rider = riders.filter(r => r.id === activeRider)[0];
+        const activePlayer = rider.player;
+
+        return activePlayer;
+    }
+
+    const makeHumanDecision = (riderId, value) => {
+        gameEngine.setHumanDecision(riderId, value);
+        gameEngine.processCpuDecisionsUntilNextHumanPlayer(riderId);
+
+        const areMoreHumanRidersThisRound = gameEngine.areMoreHumanPlayersThisRound(riderId);
+
+        if (areMoreHumanRidersThisRound) {
+            const nextHumanRiderId = gameEngine.getNextHumanRiderId(riderId);
+
+            setActiveRider(nextHumanRiderId);
+        } else {
+            processEndOfRound();
         }
+    };
 
-        let newState = {}; // ToDo: deep copy of current state
+    const processEndOfRound = () => {
+        gameEngine.processAllDecision();
+        setRiders(gameEngine.getNewRidersState());
+        setActiveRider(0);
 
-        // if()
-
-        // if (activePrimaryRider === true) {
-        //     newState = this.gameEngine.setHumanDecision(true, value);
-        // } else {
-        //     newState = this.gameEngine.setHumanDecision(false, value);
-        //     newState = this.gameEngine.processRestOfTurn(newState, riders, trackHills);
-
-        //     setRiders(newState.riders);
-        // }
-
-        // setActivePrimaryRider(newState.activePrimaryRider);
-        // setActivePlayer(newState.activePlayer);
+        console.log("End of round");
 
         // var maxPosition = Math.max.apply(Math, riders.map(function(o) { return o.positionX; }));
         // var winningPlayer = riders.filter( r => r.positionX === maxPosition)[0].player;
@@ -77,13 +86,13 @@ const Game = () => {
         // }
 
         // console.log("Finished making decision");
-    };
+    }
 
     return (
         <Fragment>
             <Track 
                 riders = {riders}
-                trackHills = {trackHills}
+                trackHills = {track}
             />
             <h1>Test Game</h1>
             <div className = "playersContainer" >
@@ -93,8 +102,8 @@ const Game = () => {
                         player = { p.id } 
                         isHuman = {p.isHuman}
                         riders = { riders.filter(r => r.player === p.id)}
-                        makeDecision = { makeDecision }
-                        activePlayer = { activePlayer }
+                        makeHumanDecision = { makeHumanDecision }
+                        activePlayer = { getActivePlayer() }
                         activeRider = { activeRider }
                         // hasFinished = { hasFinished}
                     />
