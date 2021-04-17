@@ -19,10 +19,10 @@ class Rider {
         if (customDeck) {
             return JSON.parse(JSON.stringify(customDeck));
         }
-        if(name === "Sprinter"){
+        if (name === "Sprinter"){
             return initialSprinterDeck;
         }
-        if(!customDeck && name === "Rouller") {
+        if (!customDeck && name === "Rouller") {
             return initialRoullerDeck;
         }
 
@@ -67,7 +67,7 @@ class Rider {
 
         if (index === -1) {
             console.error("Tried to use invalid card");
-            debugger;
+            // debugger;
         } else {
             this.cards.splice(index,1); 
         }

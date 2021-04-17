@@ -3,10 +3,12 @@ import Rider from './Rider';
 class GameEngine {
     constructor(players, riders, track){
         this.players = this.arrayDeepCopy(players);
-        this.riders = this.arrayDeepCopy(riders);
+        this.riders = _deepCopyRiders();
+        // this.riders = _deepCopyObject(riders);
         this.track = this.arrayDeepCopy(track)
 
         this.decisions = [];
+        console.log("initialize decisions");
     }
 
     arrayDeepCopy = arr => {
@@ -16,6 +18,7 @@ class GameEngine {
 
     setHumanDecision(riderId, value) {
         this.decisions[riderId] = value;
+        console.log("update human decisions");
     }
 
     areMoreHumanPlayersThisRound(currentRiderId) {
@@ -27,7 +30,6 @@ class GameEngine {
     getNextHumanRiderId(currentRiderId) {
         const self = this;
 
-        debugger;
         return this.riders.filter(r => r.id > currentRiderId && self.players[r.player].isHuman)[0].id;
     }
 
@@ -37,19 +39,24 @@ class GameEngine {
         if (this.areMoreHumanPlayersThisRound(currentRiderId)){
             nextHumanId = this.getNextHumanRiderId(currentRiderId);
         } else {
-            nextHumanId = this.riders.len;
+            nextHumanId = this.riders.length;
         }
         
         // foreach next CPU
         for (let id = currentRiderId + 1; id < nextHumanId; id++) {
             const cpuDecision = this._getAIDecision(currentRiderId);
 
-            this.decisions[currentRiderId] = cpuDecision;
+            this.decisions[id] = cpuDecision;
+            console.log("set CPU decision");
         }
     }
 
     processAllDecision() {
         this._processDecisions();
+    }
+
+    getNewRidersState() {
+        return this.riders;
     }
 
     // processRestOfTurn(stateUpdate, riders, trackHills) {
@@ -63,10 +70,9 @@ class GameEngine {
     //     return stateUpdate;
     // }
 
-    _getTopCards(riders, player, isSprinter, nCards=4) {
-        var cards = riders.filter(r => 
-            r.player === player 
-            && r.isSprinter === isSprinter
+    _getTopCards(currentRiderId, nCards=4) {
+        var cards = this.riders.filter(r => 
+            r.id === currentRiderId
         )[0].cards;
 
         return cards.slice(0, nCards);
@@ -91,13 +97,13 @@ class GameEngine {
         return rider;
     }
 
-    _getDecision(player, isSprinter) {
-        const decision = this.decisions.filter( d => 
-            d.player === player &&
-            d.isSprinter === (isSprinter===0 ? true : false))[0];
+    // _getDecision(player, isSprinter) {
+    //     const decision = this.decisions.filter( d => 
+    //         d.player === player &&
+    //         d.isSprinter === (isSprinter===0 ? true : false))[0];
 
-        return decision;
-    }
+    //     return decision;
+    // }
 
     _processDecisions() {
         console.log("Processing decisions");
@@ -115,9 +121,9 @@ class GameEngine {
             return p2-p1;
         });
 
-        // for each rider, move the expected number of squares, if possible
+        // for each rider, move the expected number of squares, if there's space available
         sortedRiders.forEach( function(rider) {
-            let decision = this.decisions[rider.id];
+            let decision = this.decisions[rider.id]; //being called too early? At the moment only has 2 decisions, from human player
 
             // Add up/downhill logic
             var isDownHill = false;
@@ -142,62 +148,34 @@ class GameEngine {
                 decision = 5;
             }
 
-            
             // if has space on target space, then move it there
             for (let d = decision; d>=0; d--) {
                 let targetPosition = rider.positionX + d;
-                const nRidersOnTargetPosition = ridersPosition.filter(rp => rp.position === targetPosition).length;
+                const nRidersOnTargetPosition = ridersPosition.filter(rp => rp.positionX === targetPosition).length;
                 
                 if (nRidersOnTargetPosition < 2) { // then rider fills the spot
                     ridersPosition.push({
                         id: rider.id,
-                        position: targetPosition
+                        positionX: targetPosition
                     });
                     break;
                 } else if(d===0){
                     ridersPosition.push({
                         id: rider.id,
-                        position: targetPosition
+                        positionX: targetPosition
                     });
                     break;
                 }
             }
-        });
-
-            // Process Slipstream
-        //     var finishLoop = false;
-
-        //     var hasSlipstream = () => {
-        //         return ridersPosition.filter( rp =>
-        //             rp.position === ridersPosition
-        //             ).length < 2;
-        //     };
-
-        //     do { 
-        //         if (hasSlipstream()) { // If there's a free space, move to target position
-        //             rider.setPosition(targetPosition);
-        //             var tIndex = trackPosition.findIndex( t =>
-        //                 t.isSprinter === (rider.isSprinter ? 0 : 1)  && 
-        //                 t.player === rider.player
-        //                 );
-        //             trackPosition[tIndex].position = targetPosition;
-        //             finishLoop = true;
-        //         } else { // can't move there
-        //             targetPosition--;
-        //             if(targetPosition <=0){
-        //                 finishLoop = true;
-        //             }
-        //         }
-        //     } while (!finishLoop)
-        // }, this);
+        }, this);
 
         // drag riders 
         console.log("To Continue cleaning from here");
 
         var sortedTrackPositions = ridersPosition.sort(
             function(t1, t2) {
-                var p1 = t1.position;
-                var p2 = t2.position;
+                var p1 = t1.positionX;
+                var p2 = t2.positionX;
     
                 return p1-p2; // Ascending order
             }
@@ -205,8 +183,8 @@ class GameEngine {
         
         // foreach sorted track position
         for (let i = 0; i < 7; i++) {
-            var pos = sortedTrackPositions[i].position;
-            var nextPos = sortedTrackPositions[i+1].position;
+            var pos = sortedTrackPositions[i].positionX;
+            var nextPos = sortedTrackPositions[i+1].positionX;
             var testPos;
 
             if (nextPos === pos + 2) { // drag happens
@@ -214,32 +192,30 @@ class GameEngine {
 
                 // move up current rider
                 var riderIndex = this.riders.findIndex( r => 
-                    r.player === sortedTrackPositions[i].player 
-                    && r.isSprinter === (sortedTrackPositions[i].isSprinter === 0 ? false : true)
-                )
+                    r.id ===  sortedTrackPositions[i].id
+                );
 
                 this.riders[riderIndex].positionX = pos + 1;
 
-                sortedTrackPositions[i].position = pos + 1;
+                sortedTrackPositions[i].positionX = pos + 1;
 
 
                 for (let j = i-1; j >= 0; j--) {
                     if(j<0){
                         return;
                     }
-                    testPos = sortedTrackPositions[j].position;
+                    testPos = sortedTrackPositions[j].positionX;
                     if (testPos > lPos - 2) { //within drag range
                         lPos = testPos;
                         // Move riders
                         var riderIndex2 = this.riders.findIndex( r => 
-                            r.player === sortedTrackPositions[j].player 
-                            && r.isSprinter === (sortedTrackPositions[j].isSprinter === 0 ? false : true)
+                            r.id === sortedTrackPositions[j].id
                         )
                         
                         this.riders[riderIndex2].positionX = lPos + 1;
 
                         // update track position
-                        sortedTrackPositions[j].position = lPos + 1;
+                        sortedTrackPositions[j].positionX = lPos + 1;
                     } else {
                         j = -1;
                     }
@@ -249,16 +225,15 @@ class GameEngine {
         }
 
         // fatigue riders
-        sortedTrackPositions.forEach( function(trackPosition, index) {
+        // this.riders.forEach(r => {
+        //     if(sortedTrackPositions)
+        // });
+
+        sortedTrackPositions.forEach( function(rider, index) {
             if (sortedTrackPositions.filter(t =>
-                t.position === trackPosition.position + 1
+                t.positionX === rider.positionX + 1
             ).length <= 0 ) { //in front of the pack
-                var riderIndex = this.riders.findIndex( r => 
-                    r.player === sortedTrackPositions[index].player 
-                    && r.isSprinter === (sortedTrackPositions[index].isSprinter === 0 ? false : true)
-                )
-                
-                this.riders[riderIndex].getTired();
+                this.riders[rider.id].getTired();
             }
         }, this);
 
@@ -267,33 +242,36 @@ class GameEngine {
 
     _resetDecisions() {
         this.decisions = [];
+        console.log("reset decisions");
     }
 }
 
-function _deepCopyRiders(riders) {
+function _deepCopyRiders() {
+    debugger;
     var clonedRiders = [
-        new Rider( 0 , 3, 0, true),
-        new Rider( 0 , 0, 1, false),
-        new Rider( 1 , 2, 0, true),
-        new Rider( 1 , 1, 1, false),
-        new Rider( 2 , 1, 0, true),
-        new Rider( 2 , 2, 1, false),
-        new Rider( 3 , 0, 0, true),
-        new Rider( 3 , 3, 1, false)
+        new Rider( 0, 0 , 3, 0, "Sprinter"),
+        new Rider( 1, 0, 0, 1, "Rouller"),
+        // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
+        new Rider( 2, 1 , 2, 0, "Sprinter"),
+        new Rider( 3, 1 , 1, 1, "Rouller"),
+        new Rider( 4, 2 , 1, 0, "Sprinter"),
+        new Rider( 5, 2 , 2, 1, "Rouller"),
+        new Rider( 6, 3 , 0, 0, "Sprinter"),
+        new Rider( 7, 3 , 3, 1, "Rouller")
     ];
 
-    clonedRiders.forEach(function(clonedRider) {
-        var originalRider = riders.filter( r => 
-            r.isSprinter === clonedRider.isSprinter &&
-            r.player === clonedRider.player);
+    // clonedRiders.forEach(function(clonedRider) {
+    //     var originalRider = riders.filter( r => 
+    //         r.isSprinter === clonedRider.isSprinter &&
+    //         r.player === clonedRider.player);
 
-        var deepCopy = _deepCopyObject(originalRider[0]);
+    //     var deepCopy = _deepCopyObject(originalRider[0]);
 
-        clonedRider.cards = deepCopy.cards;
-        clonedRider.cardsDiscarded = deepCopy.cardsDiscarded;
-        clonedRider.nextMove = deepCopy.nextMove;
-        clonedRider.positionX = deepCopy.positionX;
-    }, this);
+    //     clonedRider.cards = deepCopy.cards;
+    //     clonedRider.cardsDiscarded = deepCopy.cardsDiscarded;
+    //     clonedRider.nextMove = deepCopy.nextMove;
+    //     clonedRider.positionX = deepCopy.positionX;
+    // }, this);
 
     return clonedRiders;
 }

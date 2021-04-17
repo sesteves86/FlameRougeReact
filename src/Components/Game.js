@@ -3,6 +3,7 @@ import GameEngine from "./GameEngine";
 import Player from "./Player";
 import Rider from "./Rider";
 import Track from "./Track";
+import Track2 from "./Track2";
 
 const Game = () => {
     const [ activeRider, setActiveRider] = useState(0);
@@ -69,7 +70,9 @@ const Game = () => {
 
     const processEndOfRound = () => {
         gameEngine.processAllDecision();
-        setRiders(gameEngine.getNewRidersState());
+        const ridersState = gameEngine.getNewRidersState();
+        console.log(ridersState);
+        setRiders(ridersState);
         setActiveRider(0);
 
         console.log("End of round");
@@ -91,6 +94,10 @@ const Game = () => {
     return (
         <Fragment>
             <Track 
+                riders = {riders}
+                trackHills = {track}
+            />
+            <Track2 
                 riders = {riders}
                 trackHills = {track}
             />

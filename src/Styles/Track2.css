@@ -1,0 +1,85 @@
+.track2{
+    background-color: #ccc;
+    width: 90%;
+    height: 6em;
+    margin: 10px auto 40px;
+
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding-bottom: 12px;
+    position: relative;
+}
+
+.track2-segment{
+    border: 1px solid #aaa;
+    display: inline-block;
+    min-width: 1.5em;
+    min-height: 8em;
+}
+
+.track2-lane{
+    align-items: center;
+    border-bottom: 3px solid #ccc;
+    height: 2em;
+}
+
+.track2-segment:nth-child(odd) > .track2-lane:nth-child(1){
+    border-bottom: 3px solid #fff;
+}
+
+.track2-lane--counter {
+    border-top: 3px solid #fff;
+}
+
+.track2-segment-counter {
+    border: none;
+    color: #f00;
+}
+
+.track2-segment-player-0{
+    background-color: #88f;
+}
+.track2-segment-player-1{
+    background-color: #8f8;
+}
+.track2-segment-player-2{
+    background-color: #f88;
+}
+.track2-segment-player-3{
+    background-color: #ff8;
+}
+.track2-down{
+    border: 2px solid #aaf;
+}
+.track2-up{
+    border: 2px solid #faa;
+}
+
+.track2-rider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 1em;
+    /* translate: 100%; */
+    transition: top 2s, left 2s;
+}
+
+.track2-rider:hover {
+    left: 20em;
+}
+
+.track2-rider-player-0{
+    background-color: #88f;
+}
+.track2-rider-player-1{
+    background-color: #8f8;
+}
+.track2-rider-player-2{
+    background-color: #f88;
+}
+.track2-rider-player-3{
+    background-color: #ff8;
+}
