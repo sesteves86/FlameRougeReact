@@ -2,26 +2,22 @@ import React, {Fragment, useState, useEffect} from "react";
 import GameEngine from "./GameEngine";
 import Player from "./Player";
 import Rider from "./Rider";
-import Track from "./Track";
 import Track2 from "./Track2";
 
-const Game = () => {
+const Game = ({track}) => {
     const [ activeRider, setActiveRider] = useState(0);
     const [ riders, setRiders] = useState([
         new Rider( 0, 0 , 3, 0, "Sprinter"),
         new Rider( 1, 0, 0, 1, "Rouller"),
-        // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
-        new Rider( 2, 1 , 2, 0, "Sprinter"),
+        new Rider( 2, 1, 6, 0, "Cheater", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,9,9,9,9,9,9,9,9,9,9,9,9,9]),
+        // new Rider( 2, 1 , 2, 0, "Sprinter"),
         new Rider( 3, 1 , 1, 1, "Rouller"),
         new Rider( 4, 2 , 1, 0, "Sprinter"),
         new Rider( 5, 2 , 2, 1, "Rouller"),
         new Rider( 6, 3 , 0, 0, "Sprinter"),
         new Rider( 7, 3 , 3, 1, "Rouller")
     ]);
-    const [ track, setTrackHills] = useState({
-        up: [15, 40],
-        down: [10, 45]
-    });
+
     const [gameEngine, setGameEngine] = useState({});
 
     const players = [

@@ -1,12 +1,11 @@
 import React, { useState, Fragment } from 'react';
 import GameEngine from './Components/GameEngine';
-import Help from './Components/Help';
+import Help from './Components/StartingMenu/Help';
 import Game from './Components/Game';
-import StartingMenu from './Components/StartingMenu';
+import StartingMenu from './Components/StartingMenu/StartingMenu';
+import StandardRaceMenu from './Components/StartingMenu/StandardRaceMenu';
 import Player from './Components/Player';
 import Rider from './Components/Rider';
-import SplashScreen from './Components/SplashScreen';
-import Track from './Components/Track';
 import WinnerScreen from './Components/WinnerScreen';
 import './App.css';
 
@@ -44,7 +43,7 @@ const App = ( () => {
     ]
 
     const menu = {
-        splashScreen: "Splash Screen",
+        standardRaceMenu: "Standard Race Menu",
         startingMenu: "Starting Menu",
         game: "Game",
         rules: "Rules",
@@ -55,8 +54,7 @@ const App = ( () => {
     const [ activePrimaryRider, setActivePrimaryRider] = useState(true); //ToDo: Rename
     const [ gameEngine, setGameEngine] = useState(new GameEngine());
     const [ hasFinished, setHasFinished] = useState(false);
-    const [ activeScreen, setActiveScreen] = useState(menu.game);
-    // const [ activeScreen, setActiveScreen] = useState(menu.splashScreen);
+    const [ activeScreen, setActiveScreen] = useState(menu.startingMenu);
     const [ riders, setRiders] = useState(initialRidersPosition);
     const [ trackHills, setTrackHills] = useState({
         up: [15, 40],
@@ -106,31 +104,11 @@ const App = ( () => {
         console.log("Finished making decision");
     };
 
-    const renderedPlayers = players.map( (p) => (
-        <Player
-            key = { p.id }
-            player = { p } 
-            rider1 = { riders.filter( r => r.player === p.id && r.isSprinter === true )[0] } 
-            rider2 = { riders.filter( r => r.player === p.id && r.isSprinter === false )[0] }
-            makeDecision = { makeDecision }
-            activePlayer = { activePlayer }
-            activePrimaryRider = { activePrimaryRider }
-            hasFinished = { hasFinished}
-        />
-    ), this);
-
     return (
         <div className="App">
             <img className="backgroundImage" src={require('./Images/flameRougeBackground.png')} alt="background"/>
             <h1 className="mainTitle">Flame Rouge</h1>
-            <Game />
-
-            {/* {activeScreen === menu.splashScreen && 
-                <SplashScreen 
-                    setActiveScreen = {setActiveScreen}
-                    menu = {menu}
-                />
-            }
+         
             {activeScreen === menu.startingMenu && 
                 <StartingMenu
                     setActiveScreen = {setActiveScreen}
@@ -138,16 +116,18 @@ const App = ( () => {
                 />
             }
 
+            {activeScreen === menu.standardRaceMenu && 
+                <StandardRaceMenu 
+                    setActiveScreen = {setActiveScreen}
+                    setTrackHills = {setTrackHills}
+                    menu = {menu}
+                />
+            }
+            
             {activeScreen === menu.game && 
-                <Fragment>
-                    <Track 
-                        riders = {riders}
-                        trackHills = {trackHills}
-                    />
-                    <div className = "playersContainer" >
-                        { renderedPlayers }
-                </div>
-                </Fragment>
+                <Game
+                    track = {trackHills}
+                />
             }
 
             {activeScreen === menu.winner && 
@@ -167,7 +147,7 @@ const App = ( () => {
                     activeScreen = {activePlayer}
                     menu = {menu}
                 />
-            } */}
+            }
         </div>
     );
 });

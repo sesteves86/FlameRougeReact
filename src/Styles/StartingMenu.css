@@ -1,0 +1,13 @@
+.startingMenu__button{
+    max-width: 40em;
+}
+
+.startingMenu__button-container {
+
+}
+
+.startingMenu__container{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import './../Styles/Help.css';
+import './../../Styles/Help.css';
 
 const Help = ({setActiveScreen, menu, activeScreen}) => {
 

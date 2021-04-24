@@ -18,6 +18,13 @@
     min-height: 8em;
 }
 
+.track2-segment--1{ /*uphill*/
+    background-color: #ecc;
+}
+.track2-segment--2{ /*uphill*/
+    background-color: #cce;
+}
+
 .track2-lane{
     align-items: center;
     border-bottom: 3px solid #ccc;
