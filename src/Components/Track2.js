@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import './../Styles/Track2.css';
 import PropTypes from 'prop-types';
+import {useSprings, animated } from "react-spring";
 
 const Track2 = (({trackHills, riders}) => {
     const terrain = {
+        flat: 0,
         up: 1, 
         down: 2, 
-        flat: 3,
     };
+    const playerColours = [
+        "#88f",
+        "#8f8",
+        "#f88",
+        "#ff8",
+    ];
 
     const [trackRender, setTrackRender] = useState(
     [{
@@ -16,39 +23,77 @@ const Track2 = (({trackHills, riders}) => {
         distanceLeft: 70
     }]);
 
+    const springs = useSprings(riders.length, riders.map( r => {
+        
+        return {
+            top: (40 + riders[r.id].lane * 35) + "px",
+            left: (riders[r.id].positionX * 27 + 1) + "px",
+            "background-color": playerColours[r.player]
+        }
+    }));
+
     useEffect(() => {
         setTrackRender(buildTrack(trackHills));
     }, [trackHills, riders]);
 
     const buildTrack = trackHills => {
         const trackLength = 70;
-
         let tempTrack = [];
-
+        
         for (let segment = 0; segment < trackLength; segment++) {
-            const terrainType = terrain.flat;
-
             tempTrack.push({
                 id: segment,
-                terrain: terrainType,
+                terrain: terrain.flat,
                 distanceLeft: trackLength - segment
             });
         }
 
+        const upHills = [];
+        const downHills = [];
+
+        trackHills.up.forEach(u => {
+            upHills.push(u, u+1, u+2, u+3, u+4);
+        });
+        trackHills.down.forEach(d => {
+            downHills.push(d, d+1, d+2, d+3, d+4);
+        });
+
+        upHills.forEach(u => {
+            tempTrack[u].terrain = terrain.up;
+        });
+        downHills.forEach(d => {
+            tempTrack[d].terrain = terrain.down;
+        });
+
+        console.log(trackHills);
+        console.log(tempTrack);
+
         return tempTrack;
     };
 
+    const getRidersInitial = i => {
+        return riders[i].name.substr(0,1).toUpperCase();
+    }
+
     return (
         <div className="track2">
-            { trackRender && trackRender.map( (segment, i) => (
-                <div className="track2-segment" key={i}>
-                    <div className="track2-lane"></div>
-                    <div className="track2-lane"></div>
-                    <div className="track2-lane track2-lane--counter">{ segment.distanceLeft%5===0 ? segment.distanceLeft : ""}</div>
-                </div>
-            )) }
-            { riders.map((rider, index) => (
-                <div className={"track2-rider track2-rider-player-"+rider.player} style={{top: "0", left: "0"}}></div>
+            { trackRender && trackRender.map( (segment, i) => {
+                const className = `track2-segment track2-segment--${segment.terrain}`;
+
+                return (
+                    <div className={className} key={i}>
+                        <div className="track2-lane"></div>
+                        <div className="track2-lane"></div>
+                        <div className="track2-lane"></div>
+                        <div className="track2-lane track2-lane--counter">{ segment.distanceLeft%5===0 ? segment.distanceLeft : ""}</div>
+                    </div>
+                );
+            }) }
+            {springs.map((props, i) => (
+                <animated.div className={"track2-rider"} style={props}>
+                    {getRidersInitial(i)}
+                </animated.div>
+                
             ))}
         </div>
     );

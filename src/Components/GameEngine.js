@@ -1,10 +1,10 @@
-import Rider from './Rider';
+// import Rider from './Rider';
 
 class GameEngine {
     constructor(players, riders, track){
         this.players = this.arrayDeepCopy(players);
-        this.riders = _deepCopyRiders();
-        // this.riders = _deepCopyObject(riders);
+        // this.riders = riders//_deepCopyRiders();
+        this.riders = _deepCopyObject(riders);
         this.track = this.arrayDeepCopy(track)
 
         this.decisions = [];
@@ -18,7 +18,6 @@ class GameEngine {
 
     setHumanDecision(riderId, value) {
         this.decisions[riderId] = value;
-        console.log("update human decisions");
     }
 
     areMoreHumanPlayersThisRound(currentRiderId) {
@@ -29,8 +28,11 @@ class GameEngine {
 
     getNextHumanRiderId(currentRiderId) {
         const self = this;
+        const nextHumanRiderId = this.riders.filter(r => 
+            r.id > currentRiderId && self.players[r.player].isHuman
+        )[0].id;
 
-        return this.riders.filter(r => r.id > currentRiderId && self.players[r.player].isHuman)[0].id;
+        return nextHumanRiderId;
     }
 
     processCpuDecisionsUntilNextHumanPlayer(currentRiderId) {
@@ -47,7 +49,6 @@ class GameEngine {
             const cpuDecision = this._getAIDecision(currentRiderId);
 
             this.decisions[id] = cpuDecision;
-            console.log("set CPU decision");
         }
     }
 
@@ -59,23 +60,16 @@ class GameEngine {
         return this.riders;
     }
 
-    // processRestOfTurn(stateUpdate, riders, trackHills) {
-    //     this._getAIDecisions(riders);
-        
-    //     var ridersDeepCopy =_deepCopyRiders(riders);
-    //     stateUpdate.riders = this._processDecisions(ridersDeepCopy, trackHills);
-    //     stateUpdate = this._processTurn(stateUpdate);
-    //     this._resetDecisions();
-
-    //     return stateUpdate;
-    // }
-
     _getTopCards(currentRiderId, nCards=4) {
         var cards = this.riders.filter(r => 
             r.id === currentRiderId
         )[0].cards;
 
-        return cards.slice(0, nCards);
+        const deepCopyDeck = JSON.parse(JSON.stringify(cards));
+        const shuffledDeck = deepCopyDeck.sort(() => 0.5 - Math.random());
+        const topNCards = shuffledDeck.slice(0,nCards);
+
+        return topNCards;
     }
 
     /* Private functions*/
@@ -97,26 +91,26 @@ class GameEngine {
         return rider;
     }
 
-    // _getDecision(player, isSprinter) {
-    //     const decision = this.decisions.filter( d => 
-    //         d.player === player &&
-    //         d.isSprinter === (isSprinter===0 ? true : false))[0];
-
-    //     return decision;
-    // }
-
     _processDecisions() {
-        console.log("Processing decisions");
         let ridersPosition = [];
 
         this.riders.forEach(rider => {
-            rider.useCard(this.decisions[rider.id]);
+            
+            const selectedCard = this.decisions[rider.id];
+            var index = rider.cards.indexOf(selectedCard);
+
+            if (index === -1) {
+                console.error("Tried to use invalid card");
+            } else {
+                rider.cards.splice(index,1); 
+            }
         });
 
         // Get riders Position
-        var sortedRiders = this.riders.sort( function(r1, r2) {
-            var p1 = r1.getPosition() + r1.getLane()*0.2;
-            var p2 = r2.getPosition() + r2.getLane()*0.2;
+        var sortedRiders = _deepCopyObject(this.riders);
+        sortedRiders = sortedRiders.sort( function(r1, r2) {
+            var p1 = r1.positionX + r1.lane*0.2;
+            var p2 = r2.positionX + r2.lane*0.2;
 
             return p2-p1;
         });
@@ -156,13 +150,15 @@ class GameEngine {
                 if (nRidersOnTargetPosition < 2) { // then rider fills the spot
                     ridersPosition.push({
                         id: rider.id,
-                        positionX: targetPosition
+                        positionX: targetPosition,
+                        lane: nRidersOnTargetPosition
                     });
                     break;
                 } else if(d===0){
                     ridersPosition.push({
                         id: rider.id,
-                        positionX: targetPosition
+                        positionX: targetPosition,
+                        lane: rider.lane
                     });
                     break;
                 }
@@ -172,7 +168,9 @@ class GameEngine {
         // drag riders 
         console.log("To Continue cleaning from here");
 
-        var sortedTrackPositions = ridersPosition.sort(
+        var sortedTrackPositions = _deepCopyObject(ridersPosition);
+
+        sortedTrackPositions = sortedTrackPositions.sort(
             function(t1, t2) {
                 var p1 = t1.positionX;
                 var p2 = t2.positionX;
@@ -182,7 +180,7 @@ class GameEngine {
         );
         
         // foreach sorted track position
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < ridersPosition.length-1; i++) {
             var pos = sortedTrackPositions[i].positionX;
             var nextPos = sortedTrackPositions[i+1].positionX;
             var testPos;
@@ -207,33 +205,24 @@ class GameEngine {
                     testPos = sortedTrackPositions[j].positionX;
                     if (testPos > lPos - 2) { //within drag range
                         lPos = testPos;
-                        // Move riders
-                        var riderIndex2 = this.riders.findIndex( r => 
-                            r.id === sortedTrackPositions[j].id
-                        )
-                        
-                        this.riders[riderIndex2].positionX = lPos + 1;
-
-                        // update track position
                         sortedTrackPositions[j].positionX = lPos + 1;
                     } else {
                         j = -1;
                     }
                 }
-                
             }
         }
 
-        // fatigue riders
-        // this.riders.forEach(r => {
-        //     if(sortedTrackPositions)
-        // });
-
         sortedTrackPositions.forEach( function(rider, index) {
+            // Update riders position
+            this.riders[rider.id].positionX = rider.positionX;
+            this.riders[rider.id].lane = rider.lane;
+
+            // Fatigue if in front
             if (sortedTrackPositions.filter(t =>
                 t.positionX === rider.positionX + 1
             ).length <= 0 ) { //in front of the pack
-                this.riders[rider.id].getTired();
+                this.riders[rider.id].cards.push(2);
             }
         }, this);
 
@@ -242,39 +231,26 @@ class GameEngine {
 
     _resetDecisions() {
         this.decisions = [];
-        console.log("reset decisions");
     }
 }
 
-function _deepCopyRiders() {
-    debugger;
-    var clonedRiders = [
-        new Rider( 0, 0 , 3, 0, "Sprinter"),
-        new Rider( 1, 0, 0, 1, "Rouller"),
-        // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
-        new Rider( 2, 1 , 2, 0, "Sprinter"),
-        new Rider( 3, 1 , 1, 1, "Rouller"),
-        new Rider( 4, 2 , 1, 0, "Sprinter"),
-        new Rider( 5, 2 , 2, 1, "Rouller"),
-        new Rider( 6, 3 , 0, 0, "Sprinter"),
-        new Rider( 7, 3 , 3, 1, "Rouller")
-    ];
+// function _deepCopyRiders() {
+//     debugger;
+//     var clonedRiders = [
+//         new Rider( 0, 0 , 3, 0, "Sprinter"),
+//         new Rider( 1, 0, 0, 1, "Rouller"),
+//         // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
+//         new Rider( 2, 1 , 2, 0, "Sprinter"),
+//         new Rider( 3, 1 , 1, 1, "Rouller"),
+//         new Rider( 4, 2 , 1, 0, "Sprinter"),
+//         new Rider( 5, 2 , 2, 1, "Rouller"),
+//         new Rider( 6, 3 , 0, 0, "Sprinter"),
+//         new Rider( 7, 3 , 3, 1, "Rouller")
+//     ];
 
-    // clonedRiders.forEach(function(clonedRider) {
-    //     var originalRider = riders.filter( r => 
-    //         r.isSprinter === clonedRider.isSprinter &&
-    //         r.player === clonedRider.player);
 
-    //     var deepCopy = _deepCopyObject(originalRider[0]);
-
-    //     clonedRider.cards = deepCopy.cards;
-    //     clonedRider.cardsDiscarded = deepCopy.cardsDiscarded;
-    //     clonedRider.nextMove = deepCopy.nextMove;
-    //     clonedRider.positionX = deepCopy.positionX;
-    // }, this);
-
-    return clonedRiders;
-}
+//     return clonedRiders;
+// }
 
 function _deepCopyObject(obj) {
     var copy;

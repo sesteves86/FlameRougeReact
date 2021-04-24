@@ -93,15 +93,10 @@ const Game = () => {
 
     return (
         <Fragment>
-            <Track 
-                riders = {riders}
-                trackHills = {track}
-            />
             <Track2 
                 riders = {riders}
                 trackHills = {track}
             />
-            <h1>Test Game</h1>
             <div className = "playersContainer" >
                 { players.map( p => (
                     <Player
@@ -115,7 +110,6 @@ const Game = () => {
                         // hasFinished = { hasFinished}
                     />
                 )) }
-                {/* { renderedPlayers } */}
             </div>
         </Fragment>
     )

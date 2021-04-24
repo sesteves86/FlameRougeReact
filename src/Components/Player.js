@@ -14,8 +14,10 @@ const Player = ({player, isHuman, riders, makeHumanDecision, activePlayer, activ
     useEffect( () => {
         let newCardOptions = [];
         riders.forEach(r => {
-            r.shuffle();
-            newCardOptions.push(r.getTop4Cards());
+            const deepCopyDeck = JSON.parse(JSON.stringify(r.cards));
+            const shuffledDeck = deepCopyDeck.sort(() => 0.5 - Math.random());
+            const top4Cards = shuffledDeck.slice(0,4);
+            newCardOptions.push(top4Cards);
         })
         setCardOptions(newCardOptions);
     }, [riders]);

@@ -1,7 +1,7 @@
 .track2{
     background-color: #ccc;
     width: 90%;
-    height: 6em;
+    height: 9em;
     margin: 10px auto 40px;
 
     display: flex;
@@ -14,7 +14,7 @@
 .track2-segment{
     border: 1px solid #aaa;
     display: inline-block;
-    min-width: 1.5em;
+    min-width: 25px;
     min-height: 8em;
 }
 
@@ -24,7 +24,10 @@
     height: 2em;
 }
 
-.track2-segment:nth-child(odd) > .track2-lane:nth-child(1){
+.track2-segment > .track2-lane:nth-child(1){
+    border-bottom: 3px solid #fff;
+}
+.track2-segment:nth-child(odd) > .track2-lane:nth-child(2){
     border-bottom: 3px solid #fff;
 }
 
