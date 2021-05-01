@@ -4,7 +4,7 @@ import Player from "./Player";
 import Rider from "./Rider";
 import Track2 from "./Track2";
 
-const Game = ({track}) => {
+const Game = ({track, players}) => {
     const [ activeRider, setActiveRider] = useState(0);
     const [ riders, setRiders] = useState([
         new Rider( 0, 0 , 3, 0, "Sprinter"),
@@ -19,22 +19,6 @@ const Game = ({track}) => {
     ]);
 
     const [gameEngine, setGameEngine] = useState({});
-
-    const players = [
-        {
-            id: 0,
-            isHuman: true
-        }, {
-            id: 1,
-            isHuman: false
-        }, {
-            id: 2,
-            isHuman: false
-        }, {
-            id: 3,
-            isHuman: false
-        }
-    ];
 
     useEffect(() => {
         if (players && riders && track) {
@@ -67,7 +51,6 @@ const Game = ({track}) => {
     const processEndOfRound = () => {
         gameEngine.processAllDecision();
         const ridersState = gameEngine.getNewRidersState();
-        console.log(ridersState);
         setRiders(ridersState);
         setActiveRider(0);
 

@@ -1,10 +1,14 @@
 import React, { Fragment, useState } from "react";
+import random from "random";
+import arrayOrdering from "../../Utilities/ArrayOrdering";
 
-const StandardRaceMenu = ({menu, setActiveScreen, setTrackHills}) => {
+const StandardRaceMenu = ({menu, setActiveScreen, setTrackHills, setPlayers}) => {
 
     const [nUpHills, setNUpHills] = useState(2);
     const [nDownHills, setNDownHills] = useState(2);
     const [nDifficulty, setNDifficulty] = useState(0);
+    const [nHumans, setNHumans] = useState(1);
+    const [totalPlayers, setTotalPlayers] = useState(4);
 
     const onUpHillsChange = (e) => {
         const nUpHill = e.target.value;
@@ -22,6 +26,16 @@ const StandardRaceMenu = ({menu, setActiveScreen, setTrackHills}) => {
         setNDifficulty(newDifficulty);
     }
 
+    const onTotalPlayersChange = (e) => {
+        const newTotalPlayers = e.target.value;
+
+        setTotalPlayers(newTotalPlayers);
+    }
+
+    const onNHumansChange = e => {
+        setNHumans(e.target.value);
+    }
+
     const onGameStart = () => {
         const trackHills = {
             up:[],
@@ -36,8 +50,7 @@ const StandardRaceMenu = ({menu, setActiveScreen, setTrackHills}) => {
             segments.push(i);
         }
 
-        //Not good shuffling happening
-        const shuffledSegments = segments.sort(() => 0.6 - Math.random());
+        const shuffledSegments = arrayOrdering.shuffleArray(segments); 
 
         for (let i = 0; i < nUpHills; i++) {
             trackHills.up.push(shuffledSegments[0]*5);
@@ -48,22 +61,40 @@ const StandardRaceMenu = ({menu, setActiveScreen, setTrackHills}) => {
             shuffledSegments.splice(0,1);
         }
 
-        console.log(trackHills);
-
         setTrackHills(trackHills);
-        
+        const players = [];
+        // for each total players, create new object and assign isHuman: true while id < nHumans
+        for(let i = 0; i< totalPlayers; i++) {
+            const playerObj = {
+                id: i,
+                isHuman: i<nHumans
+            };
+
+            players.push(playerObj);
+        }
+        setPlayers(players);
         setActiveScreen(menu.game);
     }
 
     return (
         <Fragment>
             <h1>Standard Game Menu</h1>
-            <label>Difficulty</label>
-            <input type="text" onChange={onDifficultyChange} value={nDifficulty}/>
-            <label>UpHills</label>
-            <input type="text" onChange={onUpHillsChange} value={nUpHills}/>
-            <label>DownHills</label>
-            <input type="text" onChange={onDownHillsChange} value={nDownHills}/>
+            <div className="standardRaceMenu__container">
+                <label className="standardRaceMenu__label">Difficulty</label>
+                <input type="number" className="standardRaceMenu__input" onChange={onDifficultyChange} value={nDifficulty}/>
+            
+                <label className="standardRaceMenu__label">Number Human Players</label>
+                <input type="number" className="standardRaceMenu__input" onChange={onNHumansChange} value={nHumans}/>
+            
+                <label className="standardRaceMenu__label">Total Players</label>
+                <input type="number" className="standardRaceMenu__input" onChange={onTotalPlayersChange} value={totalPlayers}/>
+            
+                <label className="standardRaceMenu__label">UpHills</label>
+                <input type="number" className="standardRaceMenu__input" onChange={onUpHillsChange} value={nUpHills}/>
+            
+                <label className="standardRaceMenu__label">DownHills</label>
+                <input type="number" className="standardRaceMenu__input" onChange={onDownHillsChange} value={nDownHills}/>
+            </div>
             <button type="button" onClick={onGameStart} >StartRace</button>
             <button type="button" onClick={()=> {setActiveScreen(menu.startingMenu)}} >Back</button>
         </Fragment>

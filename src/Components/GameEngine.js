@@ -1,4 +1,6 @@
 // import Rider from './Rider';
+import random from "random";
+import arrayOrdering from "../Utilities/ArrayOrdering";
 
 class GameEngine {
     constructor(players, riders, track){
@@ -46,7 +48,7 @@ class GameEngine {
         
         // foreach next CPU
         for (let id = currentRiderId + 1; id < nextHumanId; id++) {
-            const cpuDecision = this._getAIDecision(currentRiderId);
+            const cpuDecision = this._getAIDecision(id);
 
             this.decisions[id] = cpuDecision;
         }
@@ -66,7 +68,7 @@ class GameEngine {
         )[0].cards;
 
         const deepCopyDeck = JSON.parse(JSON.stringify(cards));
-        const shuffledDeck = deepCopyDeck.sort(() => 0.5 - Math.random());
+        const shuffledDeck = arrayOrdering.shuffleArray(deepCopyDeck); //deepCopyDeck.sort(() => 0.5 - random.float());
         const topNCards = shuffledDeck.slice(0,nCards);
 
         return topNCards;
@@ -77,7 +79,7 @@ class GameEngine {
     _getAIDecision(currentRiderId) {
         //Need to have access to players data to make AI decisions? At the moment only chooses a card at random
         var cards = this._getTopCards(currentRiderId);
-        var cardChosenIndex = Math.floor(Math.random() * cards.length);
+        var cardChosenIndex = random.int(0, cards.length-1);
 
         return cards[cardChosenIndex];
     }
@@ -100,7 +102,8 @@ class GameEngine {
             var index = rider.cards.indexOf(selectedCard);
 
             if (index === -1) {
-                console.error("Tried to use invalid card");
+                console.error("Rider " + rider.Id + "Tried to use invalid card");
+                console.log("Card Selected: " + selectedCard);
             } else {
                 rider.cards.splice(index,1); 
             }
@@ -161,7 +164,7 @@ class GameEngine {
                         lane: rider.lane
                     });
                     break;
-                }
+                } // else was blocked
             }
         }, this);
 
@@ -233,24 +236,6 @@ class GameEngine {
         this.decisions = [];
     }
 }
-
-// function _deepCopyRiders() {
-//     debugger;
-//     var clonedRiders = [
-//         new Rider( 0, 0 , 3, 0, "Sprinter"),
-//         new Rider( 1, 0, 0, 1, "Rouller"),
-//         // new Rider( 8, 0, 4, 0, "Test", [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
-//         new Rider( 2, 1 , 2, 0, "Sprinter"),
-//         new Rider( 3, 1 , 1, 1, "Rouller"),
-//         new Rider( 4, 2 , 1, 0, "Sprinter"),
-//         new Rider( 5, 2 , 2, 1, "Rouller"),
-//         new Rider( 6, 3 , 0, 0, "Sprinter"),
-//         new Rider( 7, 3 , 3, 1, "Rouller")
-//     ];
-
-
-//     return clonedRiders;
-// }
 
 function _deepCopyObject(obj) {
     var copy;

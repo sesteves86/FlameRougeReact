@@ -11,7 +11,7 @@ import './App.css';
 
 const App = ( () => {
 
-    const players= 
+    const initialPlayers= 
     [
         {
             id: 0,
@@ -60,6 +60,8 @@ const App = ( () => {
         up: [15, 40],
         down: [10, 45]
     });
+    // const [ riders, setRiders] = useState(initialRiders); // Using to be 
+    const [ players, setPlayers] = useState(initialPlayers);
     const [ winner, setWinner] = useState(5);
 
     const resetRace = () => {
@@ -120,6 +122,7 @@ const App = ( () => {
                 <StandardRaceMenu 
                     setActiveScreen = {setActiveScreen}
                     setTrackHills = {setTrackHills}
+                    setPlayers = {setPlayers}
                     menu = {menu}
                 />
             }
@@ -127,6 +130,8 @@ const App = ( () => {
             {activeScreen === menu.game && 
                 <Game
                     track = {trackHills}
+                    players = {players}
+                    riders = {riders}
                 />
             }
 

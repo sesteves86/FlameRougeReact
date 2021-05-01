@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from "prop-types";
 import PlayerOptions from "./PlayerOptions";
 import './../Styles/Player.css';
+import arrayOrdering from "../Utilities/ArrayOrdering";
 
 const Player = ({player, isHuman, riders, makeHumanDecision, activePlayer, activeRider, hasFinished}) => {
     const [cardOptions, setCardOptions] = useState([]);
@@ -15,7 +16,7 @@ const Player = ({player, isHuman, riders, makeHumanDecision, activePlayer, activ
         let newCardOptions = [];
         riders.forEach(r => {
             const deepCopyDeck = JSON.parse(JSON.stringify(r.cards));
-            const shuffledDeck = deepCopyDeck.sort(() => 0.5 - Math.random());
+            const shuffledDeck = arrayOrdering.shuffleArray(deepCopyDeck);
             const top4Cards = shuffledDeck.slice(0,4);
             newCardOptions.push(top4Cards);
         })

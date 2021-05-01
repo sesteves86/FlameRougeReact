@@ -27,15 +27,6 @@ class Rider {
         return [];
     }
 
-    shuffle(){
-        var newPosition, tempHolder;
-        for (var i = this.cards.length - 1; i > 0; i--) {
-            newPosition = Math.floor(Math.random() * (i + 1));
-            tempHolder = this.cards[i];
-            this.cards[i] = this.cards[newPosition];
-            this.cards[newPosition] = tempHolder;
-        }
-    }
 
     getTired() {
         this.cards.push(2);

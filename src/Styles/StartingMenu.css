@@ -11,3 +11,17 @@
     flex-direction: column;
     gap: 0.5em;
 }
+
+.standardRaceMenu__container {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.standardRaceMenu__label {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.standardRaceMenu__input {
+    max-width: 100px;
+}

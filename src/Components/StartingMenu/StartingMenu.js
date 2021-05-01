@@ -9,12 +9,12 @@ const StartingMenu = ({menu, setActiveScreen}) => {
             <div className="startingMenu__button-container">
                 <button className="startingMenu__button" onClick={() => {
                     setActiveScreen(menu.game)
-                }}>Campaign</button>
+                }}>Quick Race</button>
             </div>
             <div className="startingMenu__button-container">
                 <button className="startingMenu__button" onClick={() => {
                     setActiveScreen(menu.standardRaceMenu)
-                }}>Standard Game</button>
+                }}>Custom Race</button>
             </div>
             <div className="startingMenu__button-container">
                 <button className="startingMenu__button" onClick={() => {

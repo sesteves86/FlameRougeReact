@@ -65,9 +65,6 @@ const Track2 = (({trackHills, riders}) => {
             tempTrack[d].terrain = terrain.down;
         });
 
-        console.log(trackHills);
-        console.log(tempTrack);
-
         return tempTrack;
     };
 
