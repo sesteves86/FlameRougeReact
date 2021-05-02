@@ -10,6 +10,7 @@ class GameEngine {
         this.track = this.arrayDeepCopy(track)
 
         this.decisions = [];
+        this.ridersPosition = [];
         console.log("initialize decisions");
     }
 
@@ -54,12 +55,8 @@ class GameEngine {
         }
     }
 
-    processAllDecision() {
-        this._processDecisions();
-    }
-
     getNewRidersState() {
-        return this.riders;
+        return _deepCopyObject(this.riders);
     }
 
     _getTopCards(currentRiderId, nCards=4) {
@@ -93,8 +90,8 @@ class GameEngine {
         return rider;
     }
 
-    _processDecisions() {
-        let ridersPosition = [];
+    processAllDecision() {
+        this.ridersPosition = [];
 
         this.riders.forEach(rider => {
             
@@ -112,53 +109,55 @@ class GameEngine {
         // Get riders Position
         var sortedRiders = _deepCopyObject(this.riders);
         sortedRiders = sortedRiders.sort( function(r1, r2) {
-            var p1 = r1.positionX + r1.lane*0.2;
-            var p2 = r2.positionX + r2.lane*0.2;
+            var p1 = r1.positionX - r1.lane*0.2;
+            var p2 = r2.positionX - r2.lane*0.2;
 
             return p2-p1;
         });
 
         // for each rider, move the expected number of squares, if there's space available
         sortedRiders.forEach( function(rider) {
+            const currentPositionX = rider.positionX;
             let decision = this.decisions[rider.id]; //being called too early? At the moment only has 2 decisions, from human player
 
             // Add up/downhill logic
-            var isDownHill = false;
-            var isUpHill = false;
+            var startsOnDownHill = false;
 
             this.track.down.forEach(d => {
-                if (rider.positionX >= d && rider.positionX < d + 5) {
-                    isDownHill = true;
-                }
-            });
-            this.track.up.forEach(d => {
-                if (rider.positionX >= d && rider.positionX < d + 5) {
-                    isUpHill = true;
+                if (currentPositionX >= d && currentPositionX < d + 5) {
+                    startsOnDownHill = true;
                 }
             });
 
-            if (isDownHill && decision < 5) {
+            if (startsOnDownHill && decision < 5) {
                 decision = 5;
             }
 
-            if (isUpHill && decision > 5) {
-                decision = 5;
-            }
+            //uphill
+            this.track.up.forEach(u => {
+                const passesThroughUpHill = currentPositionX + decision >= u && currentPositionX < u + 5;
+                if (passesThroughUpHill) { 
+                    const distToUpHill = currentPositionX - u;
+
+                    decision = distToUpHill > 5 ? distToUpHill-1 : Math.min(decision, 5);
+                }
+            });
 
             // if has space on target space, then move it there
             for (let d = decision; d>=0; d--) {
                 let targetPosition = rider.positionX + d;
-                const nRidersOnTargetPosition = ridersPosition.filter(rp => rp.positionX === targetPosition).length;
+
+                const nRidersOnTargetPosition = this.ridersPosition.filter(rp => rp.positionX === targetPosition).length;
                 
                 if (nRidersOnTargetPosition < 2) { // then rider fills the spot
-                    ridersPosition.push({
+                    this.ridersPosition.push({
                         id: rider.id,
                         positionX: targetPosition,
                         lane: nRidersOnTargetPosition
                     });
                     break;
                 } else if(d===0){
-                    ridersPosition.push({
+                    this.ridersPosition.push({
                         id: rider.id,
                         positionX: targetPosition,
                         lane: rider.lane
@@ -168,10 +167,28 @@ class GameEngine {
             }
         }, this);
 
-        // drag riders 
-        console.log("To Continue cleaning from here");
+        var sortedTrackPositions = _deepCopyObject(this.ridersPosition);
 
-        var sortedTrackPositions = _deepCopyObject(ridersPosition);
+        sortedTrackPositions = sortedTrackPositions.sort(
+            function(t1, t2) {
+                var p1 = t1.positionX;
+                var p2 = t2.positionX;
+    
+                return p1-p2; // Ascending order
+            }
+        );
+        
+        sortedTrackPositions.forEach( function(rider, index) {
+            // Update riders position
+            this.riders[rider.id].positionX = rider.positionX;
+            this.riders[rider.id].lane = rider.lane;
+        }, this);
+
+        return this.riders;
+    }
+
+    processDrag() {
+        var sortedTrackPositions = _deepCopyObject(this.ridersPosition);
 
         sortedTrackPositions = sortedTrackPositions.sort(
             function(t1, t2) {
@@ -183,12 +200,18 @@ class GameEngine {
         );
         
         // foreach sorted track position
-        for (let i = 0; i < ridersPosition.length-1; i++) {
+        for (let i = 0; i < this.ridersPosition.length-1; i++) {
             var pos = sortedTrackPositions[i].positionX;
             var nextPos = sortedTrackPositions[i+1].positionX;
             var testPos;
 
-            if (nextPos === pos + 2) { // drag happens
+            const isUpHill = this.track.up.some(u => {
+                return pos + 2 >= u  && pos <= u + 4;
+            });
+
+            const hasDrag = nextPos === pos + 2 && !isUpHill;
+
+            if (hasDrag) {
                 var lPos = pos;
 
                 // move up current rider
@@ -197,16 +220,19 @@ class GameEngine {
                 );
 
                 this.riders[riderIndex].positionX = pos + 1;
-
                 sortedTrackPositions[i].positionX = pos + 1;
 
-
                 for (let j = i-1; j >= 0; j--) {
-                    if(j<0){
+                    if (j<0) {
                         return;
                     }
                     testPos = sortedTrackPositions[j].positionX;
-                    if (testPos > lPos - 2) { //within drag range
+
+                    const isUpHill = this.track.up.some(u => {
+                        return lPos + 2 >= u  && lPos <= u + 4;
+                    });
+
+                    if (testPos > lPos - 2 && !isUpHill) { //within drag range AND not in uphill
                         lPos = testPos;
                         sortedTrackPositions[j].positionX = lPos + 1;
                     } else {
@@ -228,8 +254,6 @@ class GameEngine {
                 this.riders[rider.id].cards.push(2);
             }
         }, this);
-
-        return this.riders;
     }
 
     _resetDecisions() {

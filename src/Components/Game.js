@@ -50,9 +50,15 @@ const Game = ({track, players}) => {
 
     const processEndOfRound = () => {
         gameEngine.processAllDecision();
-        const ridersState = gameEngine.getNewRidersState();
+        let ridersState = gameEngine.getNewRidersState();
         setRiders(ridersState);
-        setActiveRider(0);
+
+        setTimeout(() => {
+            gameEngine.processDrag();
+            ridersState = gameEngine.getNewRidersState();
+            setRiders(ridersState);
+            setActiveRider(0);
+        }, 3000);
 
         console.log("End of round");
 
